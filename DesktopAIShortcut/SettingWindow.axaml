@@ -1,0 +1,36 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:desktopAiShortcut="clr-namespace:DesktopAIShortcut"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="DesktopAIShortcut.SettingWindow"
+        Title="设置">
+   <StackPanel x:DataType="desktopAiShortcut:AISettings">
+       <StackPanel Orientation="Horizontal" >
+           <Label Content="AI名称" Width="150"></Label>
+           <TextBox Text="{Binding AIName}" Width="200"></TextBox>
+       </StackPanel>
+       <StackPanel Orientation="Horizontal" >
+           <Label Content="模型名称" Width="150"></Label>
+           <TextBox Text="{Binding Model}" Width="200"></TextBox>
+       </StackPanel>
+       <StackPanel Orientation="Horizontal" >
+           <Label Content="OpenAI兼容接口地址" Width="150"></Label>
+           <TextBox Text="{Binding Endpoint}" Width="200"></TextBox>
+       </StackPanel>
+       <StackPanel Orientation="Horizontal" >
+           <Label Content="密钥" Width="150"></Label>
+           <TextBox Text="{Binding Key}" Width="200"></TextBox>
+       </StackPanel>
+       <StackPanel Orientation="Horizontal" >
+           <Label Content="系统提示词" Width="150"></Label>
+           <TextBox AcceptsReturn="True" Height="100" Text="{Binding SysPrompt}" Width="200"></TextBox>
+       </StackPanel>
+         <StackPanel Orientation="Horizontal" >
+           
+             <Button Content="保存" Click="Save_Click"></Button>
+             <Label Content="你需要重新打开会话窗口才能生效"></Label>
+             </StackPanel>
+   </StackPanel>
+</Window>

@@ -1,0 +1,25 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DesktopAIShortcut.App"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             <TrayIcon.Icons>
+                 <TrayIcons>
+                     <TrayIcon Icon="/Assets/icon.ico" 
+                               ToolTipText="Avalonia Tray Icon ToolTip" Clicked="TrayIcon_OnClicked">
+                         <TrayIcon.Menu>
+                             <NativeMenu>
+                                 <NativeMenuItem Header="设置" Click="Setting_clicked">
+                                     
+                                 </NativeMenuItem>
+                                 <NativeMenuItem Header="退出"   Click="Exit_OnClick"/>
+                             </NativeMenu>
+                         </TrayIcon.Menu>
+                     </TrayIcon>
+                 </TrayIcons>
+             </TrayIcon.Icons>
+    <Application.Styles>
+        <!-- <SimpleTheme /> -->
+        <FluentTheme />
+    </Application.Styles>
+</Application>

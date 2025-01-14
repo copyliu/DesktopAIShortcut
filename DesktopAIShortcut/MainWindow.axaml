@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mdxaml="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:avalonia="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
+        xmlns:desktopAiShortcut="clr-namespace:DesktopAIShortcut"
+        xmlns:models="clr-namespace:DesktopAIShortcut.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Closing="Window_OnClosing"  
+        Icon="/Assets/icon.ico" 
+        ExtendClientAreaToDecorationsHint="True"
+        x:Class="DesktopAIShortcut.MainWindow"  TransparencyLevelHint="Mica, AcrylicBlur"   Background="Transparent"
+        Height="500" Width="300" 
+        Title="AI小助手">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Content="简单AI小助手"></Label>
+        <DockPanel Grid.Row="1"  IsHitTestVisible="True">
+            <DockPanel DockPanel.Dock="Bottom"  >
+           
+                <Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"></Button>
+                <TextBox Text="Hello, Avalonia!" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput" />
+            </DockPanel>
+            <ScrollViewer x:Name="ScrollViewer" >
+				<StackPanel>
+                    <desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/>
+					<ItemsControl x:Name="ItemsControl" >
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="models:ChatMsgModel">
+								<desktopAiShortcut:ChatMsgControl   Margin="10" DataContext="{Binding .}" x:DataType="models:ChatMsgModel"/>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+                    <Border Height="30"></Border>
+				</StackPanel>
+                
+            </ScrollViewer>
+     
+      
+        </DockPanel>
+        </Grid>
+
+</Window>

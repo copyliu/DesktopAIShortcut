@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <StartupObject>DesktopAIShortcut.Program</StartupObject>
+	    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
+	    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+		<Platforms>AnyCPU;ARM32;x64;x86;ARM64</Platforms>
+       
+    </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+       <UseWindowsForms>true</UseWindowsForms>
+   </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+		<PlatformTarget>x86</PlatformTarget>
+	</PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Assets\icon.ico" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.3">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.0.0" />
+        <PackageReference Include="Markdig" Version="0.40.0" />
+        <PackageReference Include="OpenAI" Version="2.1.0" />
+    </ItemGroup>
+</Project>

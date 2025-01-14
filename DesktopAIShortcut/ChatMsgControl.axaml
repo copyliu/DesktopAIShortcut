@@ -1,0 +1,19 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
+             xmlns:models="clr-namespace:DesktopAIShortcut.Models" RenderOptions.TextRenderingMode="Antialias"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DesktopAIShortcut.ChatMsgControl"
+             x:DataType="models:ChatMsgModel">
+    <DockPanel>
+        <Label DockPanel.Dock="Top" Content="{Binding UserName}" ></Label>
+        <Border DockPanel.Dock="Bottom" x:Name="Border"  CornerRadius="10">
+            <avalonia:HtmlLabel AutoSize="True" AutoSizeHeightOnly="True" Text="{Binding Html}" x:Name="_htmllabel"  Background="Transparent"  >
+           
+            </avalonia:HtmlLabel>
+        </Border>
+      
+    </DockPanel>
+</UserControl>
