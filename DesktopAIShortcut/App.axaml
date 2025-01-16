@@ -6,7 +6,7 @@
              <TrayIcon.Icons>
                  <TrayIcons>
                      <TrayIcon Icon="/Assets/icon.ico" 
-                               ToolTipText="Avalonia Tray Icon ToolTip" Clicked="TrayIcon_OnClicked">
+                               ToolTipText="桌面AI小助手" Clicked="TrayIcon_OnClicked">
                          <TrayIcon.Menu>
                              <NativeMenu>
                                  <NativeMenuItem Header="设置" Click="Setting_clicked">

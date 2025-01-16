@@ -54,7 +54,7 @@
     <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <DefaultLanguage>zh-CN</DefaultLanguage>
-    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\DesktopAIShortcut\DesktopAIShortcut.csproj</EntryPointProjectUniqueName>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -65,6 +65,7 @@
     <HoursBetweenUpdateChecks>24</HoursBetweenUpdateChecks>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+    <PackageCertificateThumbprint>0BB897804529C5FAA927D52D98A0EFA160556F37</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <AppxBundle>Always</AppxBundle>

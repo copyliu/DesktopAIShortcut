@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
@@ -21,14 +22,14 @@ public   class AISettings
 
     public void SaveSettings()
     {
-        System.IO.File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(this));
+        System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"settings.json"), System.Text.Json.JsonSerializer.Serialize(this, SourceGenerationContext.Default.AISettings));
     }
     public   void LoadSettings()
     { 
-        if (System.IO.File.Exists("settings.json"))
+        if (System.IO.File.Exists(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json")))
         {
-            string json =  System.IO.File.ReadAllText("settings.json");
-            var settings = System.Text.Json.JsonSerializer.Deserialize<AISettings>(json);
+            string json =  System.IO.File.ReadAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
+            var settings = System.Text.Json.JsonSerializer.Deserialize(json, SourceGenerationContext.Default.AISettings);
             if (settings != null)
             {
                 AIName = settings.AIName;
@@ -41,7 +42,7 @@ public   class AISettings
         }
         else
         {
-               System.IO.File.WriteAllText("settings.json", "{}");
+               System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"), "{}");
         }
     }
 }

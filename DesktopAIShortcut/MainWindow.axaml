@@ -11,18 +11,18 @@
         ExtendClientAreaToDecorationsHint="True"
         x:Class="DesktopAIShortcut.MainWindow"  TransparencyLevelHint="Mica, AcrylicBlur"   Background="Transparent"
         Height="500" Width="300" 
-        Title="AI小助手">
+        Title="桌面AI小助手">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Label Content="简单AI小助手"></Label>
+        <Label Content="桌面AI小助手"></Label>
         <DockPanel Grid.Row="1"  IsHitTestVisible="True">
             <DockPanel DockPanel.Dock="Bottom"  >
            
                 <Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"></Button>
-                <TextBox Text="Hello, Avalonia!" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput" />
+                <TextBox Text="" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput" />
             </DockPanel>
             <ScrollViewer x:Name="ScrollViewer" >
 				<StackPanel>

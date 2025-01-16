@@ -11,7 +11,7 @@
 	    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
 	    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
 		<Platforms>AnyCPU;ARM32;x64;x86;ARM64</Platforms>
-       
+	    <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
        <UseWindowsForms>true</UseWindowsForms>

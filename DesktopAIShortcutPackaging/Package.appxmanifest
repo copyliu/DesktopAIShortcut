@@ -10,7 +10,7 @@
   <Identity
     Name="38862CopyLiu.AI"
     Publisher="CN=B2B24A43-5C35-415F-9661-54323D87303A"
-    Version="0.0.19.0" />
+    Version="0.0.21.0" />
 
   <Properties>
     <DisplayName>桌面AI小助手</DisplayName>
