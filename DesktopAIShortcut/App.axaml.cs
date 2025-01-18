@@ -17,16 +17,12 @@ public partial class App : Application
     private ApplicationViewModel context;
     public override void OnFrameworkInitializationCompleted()
     {
-       
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.ShutdownMode =ShutdownMode.OnExplicitShutdown;
-            ;
-           context = new ApplicationViewModel();
-           
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            context = new ApplicationViewModel();
         }
         base.OnFrameworkInitializationCompleted();
-        
     }
 
     private void Exit_OnClick(object? sender, EventArgs e)
@@ -42,50 +38,48 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             context?.ShowWindow();
-           #if WINDOWS
+#if WINDOWS
             Avalonia.Platform.Screen screen = desktop.MainWindow.Screens.Primary;
-            
+
             var p = System.Windows.Forms.Cursor.Position;
             if (p.Y > screen.WorkingArea.Y)
             {
                 //任务栏在底部
-                var windowY = screen.WorkingArea.Bottom - 300;
+                var windowY = p.Y - 500 - 50; // 增加额外的80像素偏移，避免被任务栏遮挡
                 var windowX = p.X - 150;
-               
+
                 if (windowX + 500 > screen.WorkingArea.Right)
                 {
-                    windowX -= windowX + 500 - screen.WorkingArea.Right;
+                    windowX = screen.WorkingArea.Right - 500;
                 }
-                if (windowX < 0)
+                if (windowX < screen.WorkingArea.X)
                 {
-                    windowX+=-windowX;
+                    windowX = screen.WorkingArea.X;
                 }
                 context?.SetWindowPosition(windowX, windowY);
             }
             else
             {
                 //任务栏在顶部
-                var windowY = screen.WorkingArea.Y ;
+                var windowY = screen.WorkingArea.Y;
                 var windowX = p.X - 150;
                 if (windowX + 500 > screen.WorkingArea.Right)
                 {
-                    windowX -= windowX + 500 - screen.WorkingArea.X;
+                    windowX = screen.WorkingArea.Right - 500;
                 }
-                if (windowX < 0)
+                if (windowX < screen.WorkingArea.X)
                 {
-                    windowX+=-windowX;
+                    windowX = screen.WorkingArea.X;
                 }
                 context?.SetWindowPosition(windowX, windowY);
             }
-            
 #endif
-
         }
     }
 
     private void Setting_clicked(object? sender, EventArgs e)
     {
-       var settingWindow = new SettingWindow();
-         settingWindow.Show();
+        var settingWindow = new SettingWindow();
+        settingWindow.Show();
     }
 }

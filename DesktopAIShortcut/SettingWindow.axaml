@@ -3,34 +3,97 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:desktopAiShortcut="clr-namespace:DesktopAIShortcut"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:models="clr-namespace:DesktopAIShortcut.Models"
+		xmlns:converters="using:DesktopAIShortcut.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="DesktopAIShortcut.SettingWindow"
         Title="设置">
-   <StackPanel x:DataType="desktopAiShortcut:AISettings">
-       <StackPanel Orientation="Horizontal" >
-           <Label Content="AI名称" Width="150"></Label>
-           <TextBox Text="{Binding AIName}" Width="200"></TextBox>
-       </StackPanel>
-       <StackPanel Orientation="Horizontal" >
-           <Label Content="模型名称" Width="150"></Label>
-           <TextBox Text="{Binding Model}" Width="200"></TextBox>
-       </StackPanel>
-       <StackPanel Orientation="Horizontal" >
-           <Label Content="OpenAI兼容接口地址" Width="150"></Label>
-           <TextBox Text="{Binding Endpoint}" Width="200"></TextBox>
-       </StackPanel>
-       <StackPanel Orientation="Horizontal" >
-           <Label Content="密钥" Width="150"></Label>
-           <TextBox Text="{Binding Key}" Width="200"></TextBox>
-       </StackPanel>
-       <StackPanel Orientation="Horizontal" >
-           <Label Content="系统提示词" Width="150"></Label>
-           <TextBox AcceptsReturn="True" Height="100" Text="{Binding SysPrompt}" Width="200"></TextBox>
-       </StackPanel>
-         <StackPanel Orientation="Horizontal" >
-           
-             <Button Content="保存" Click="Save_Click"></Button>
-             <Label Content="你需要重新打开会话窗口才能生效"></Label>
-             </StackPanel>
-   </StackPanel>
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="Padding" Value="10,5"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="Margin" Value="5"/>
+		</Style>
+		<Style Selector="ComboBox">
+			<Setter Property="Margin" Value="5"/>
+		</Style>
+	</Window.Styles>
+	<Window.Resources>
+		<converters:BoolToIndexConverter x:Key="BoolToIndexConverter"/>
+	</Window.Resources>
+	<ScrollViewer>
+		<StackPanel Margin="10" x:DataType="desktopAiShortcut:AISettings">
+			<StackPanel Orientation="Horizontal">
+				<Label Content="AI名称" Width="150"/>
+				<TextBox Text="{Binding AIName}" Width="200"/>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal">
+				<Label Content="模型名称" Width="150"/>
+				<TextBox Text="{Binding Model}" Width="200"/>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal">
+				<Label Content="OpenAI兼容接口地址" Width="150"/>
+				<TextBox Text="{Binding Endpoint}" Width="200"/>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal">
+				<Label Content="密钥" Width="150"/>
+				<TextBox Text="{Binding Key}" Width="200"/>
+			</StackPanel>
+
+			<Border BorderBrush="Gray" BorderThickness="1" Margin="0,10" Padding="10">
+				<DockPanel>
+					<TextBlock DockPanel.Dock="Top" Text="上下文消息" FontWeight="Bold" Margin="0,0,0,10"/>
+					<StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<ComboBox x:Name="RoleComboBox" Width="100" SelectedIndex="0">
+								<ComboBoxItem Content="System"/>
+								<ComboBoxItem Content="Assistant"/>
+								<ComboBoxItem Content="User"/>
+							</ComboBox>
+							<ComboBox x:Name="PositionComboBox" Width="100" SelectedIndex="0">
+								<ComboBoxItem Content="之前"/>
+								<ComboBoxItem Content="之后"/>
+							</ComboBox>
+							<Button Content="添加" Click="AddContext_Click"/>
+						</StackPanel>
+						<TextBox x:Name="ContextInput" AcceptsReturn="True" Height="100"
+                                 Watermark="输入上下文消息内容"/>
+
+						<ItemsControl x:Name="ContextList">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="models:ContextMessage">
+									<Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="5">
+										<Grid ColumnDefinitions="Auto,*,Auto">
+											<StackPanel Grid.Column="0" Orientation="Horizontal">
+												<ComboBox Width="100" SelectedIndex="{Binding RoleIndex}">
+													<ComboBoxItem>System</ComboBoxItem>
+													<ComboBoxItem>Assistant</ComboBoxItem>
+													<ComboBoxItem>User</ComboBoxItem>
+												</ComboBox>
+												<ComboBox Width="100" SelectedIndex="{Binding IsBeforeChat, Converter={StaticResource BoolToIndexConverter}}">
+													<ComboBoxItem>之前</ComboBoxItem>
+													<ComboBoxItem>之后</ComboBoxItem>
+												</ComboBox>
+											</StackPanel>
+											<TextBox Grid.Column="1" Text="{Binding Content}"
+													AcceptsReturn="True" Margin="5,0"/>
+											<Button Grid.Column="2" Content="删除"
+													Click="DeleteContext_Click"/>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</StackPanel>
+				</DockPanel>
+			</Border>
+
+			<StackPanel Orientation="Horizontal">
+				<Button Content="保存" Click="Save_Click"/>
+				<Label Content="你需要重新打开会话窗口才能生效"/>
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
 </Window>

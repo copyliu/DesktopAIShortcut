@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -16,16 +17,16 @@ namespace DesktopAIShortcut;
 
 public partial class MainWindow : Window
 {
-    private  ChatClient? client;
+    private ChatClient? client;
     private ObservableCollection<ChatMsgModel> _models = new ObservableCollection<ChatMsgModel>();
     public MainWindow()
     {
         InitializeComponent();
-       
+
         ItemsControl.ItemsSource = _models;
-       
-       
-       
+
+
+
         if (Design.IsDesignMode || true)
         {
             for (int i = 0; i < 10; i++)
@@ -39,10 +40,10 @@ public partial class MainWindow : Window
             }
         }
 
-       
+
     }
 
-    public ChatMsgModel DefaultMsg=>new ChatMsgModel()
+    public ChatMsgModel DefaultMsg => new ChatMsgModel()
     {
         UserName = AISettings.Instance.AIName,
         Markdown = "你好，我是" + AISettings.Instance.AIName,
@@ -55,7 +56,7 @@ public partial class MainWindow : Window
         this.SendBtn.IsEnabled = true;
         this.ChatInput.Text = "";
         this.ChatInput.Focus();
-        
+
     }
     void DisableInput()
     {
@@ -78,26 +79,45 @@ public partial class MainWindow : Window
 
     private async void SendBtn_OnClick(object? sender, RoutedEventArgs e)
     {
-        var model= new ChatMsgModel()
+        var model = new ChatMsgModel()
         {
             UserName = AISettings.Instance.AIName,
             Markdown = "",
-            IsUser =false
-                
+            IsUser = false
         };
+
         DisableInput();
-        ;
+
         _models.Add(new ChatMsgModel()
         {
             UserName = "用户",
-            Markdown = this.ChatInput.Text?.Trim()+"",
+            Markdown = this.ChatInput.Text?.Trim() + "",
             IsUser = true
         });
+
         ScrollViewer.ScrollToEnd();
+
         try
         {
-            var ret = client.CompleteChatStreamingAsync( [new SystemChatMessage(AISettings.Instance.SysPrompt + ""), .._models.Select(p => p.ChatMessage).ToArray()]);
-           
+            var messages = new List<ChatMessage>();
+
+            // 添加聊天前的上下文消息
+            messages.AddRange(AISettings.Instance.ContextMessages
+                .Where(m => m.IsBeforeChat)
+                .OrderBy(m => m.Order)
+                .Select(m => m.ChatMessage));
+
+            // 添加当前聊天记录
+            messages.AddRange(_models.Select(p => p.ChatMessage));
+
+            // 添加聊天后的上下文消息
+            messages.AddRange(AISettings.Instance.ContextMessages
+                .Where(m => !m.IsBeforeChat)
+                .OrderBy(m => m.Order)
+                .Select(m => m.ChatMessage));
+
+            var ret = client.CompleteChatStreamingAsync(messages.ToArray());
+
             _models.Add(model);
             await foreach (var r in ret)
             {
@@ -107,43 +127,40 @@ public partial class MainWindow : Window
                 }
                 ScrollViewer.ScrollToEnd();
             }
-            
         }
         catch (Exception exception)
         {
-            model.Markdown +="\n\n出现错误："+ exception.Message;
-            // this.MarkdownScrollViewer.Markdown = exception.ToString();
+            model.Markdown += "\n\n出现错误：" + exception.Message;
         }
         finally
         {
             EnableInput();
         }
-      
     }
 
     public void NewChat()
     {
-        
-            try
+
+        try
+        {
+            AISettings.Instance.LoadSettings();
+            client = new OpenAIClient(new(AISettings.Instance.Key), new()
             {
-                AISettings.Instance.LoadSettings();
-                client = new OpenAIClient(new(AISettings.Instance.Key), new()
-                {
-                    Endpoint = new(AISettings.Instance.Endpoint),
-                }).GetChatClient(AISettings.Instance.Model);
-                defaultMsg.DataContext = DefaultMsg;
-            }
-            catch (Exception e)
+                Endpoint = new(AISettings.Instance.Endpoint),
+            }).GetChatClient(AISettings.Instance.Model);
+            defaultMsg.DataContext = DefaultMsg;
+        }
+        catch (Exception e)
+        {
+            defaultMsg.DataContext = new ChatMsgModel()
             {
-                defaultMsg.DataContext = new ChatMsgModel()
-                {
-                    UserName = "AI",
-                    Markdown = "初始化错误, 请在托盘图标点击右键, 选择设置中确认你已经设置好API信息. ",
-                    IsUser = false
-                };
-                client = null;
-            }
-        
+                UserName = "AI",
+                Markdown = "初始化错误, 请在托盘图标点击右键, 选择设置中确认你已经设置好API信息. ",
+                IsUser = false
+            };
+            client = null;
+        }
+
         this._models.Clear();
         if (client != null)
         {
