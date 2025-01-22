@@ -33,6 +33,8 @@ public partial class SettingWindow : Window
         _contextMessages = new ObservableCollection<ContextMessage>(AISettings.Instance.ContextMessages);
         UpdateContextList();  // 初始化时排序
         this.FindControl<ItemsControl>("ContextList").ItemsSource = _contextMessages;
+
+        // 使用现有设置初始化数据上下文
         this.DataContext = new AISettings()
         {
             Endpoint = AISettings.Instance.Endpoint,
@@ -40,7 +42,20 @@ public partial class SettingWindow : Window
             Model = AISettings.Instance.Model,
             AIName = AISettings.Instance.AIName,
             SysPrompt = AISettings.Instance.SysPrompt,
+            // 初始化AI参数
+            Temperature = AISettings.Instance.Temperature,
+            MaxTokens = AISettings.Instance.MaxTokens,
+            TopP = AISettings.Instance.TopP,
+            TopK = AISettings.Instance.TopK,
+            RepetitionPenalty = AISettings.Instance.RepetitionPenalty,
+            FrequencyPenalty = AISettings.Instance.FrequencyPenalty,
+            PresencePenalty = AISettings.Instance.PresencePenalty,
+            ContextWindowSize = AISettings.Instance.ContextWindowSize,
+            // 初始化新增的设置项
+            EnableAdvancedSettings = AISettings.Instance.EnableAdvancedSettings,
+            EnableLogging = AISettings.Instance.EnableLogging
         };
+
         this.SizeToContent = SizeToContent.WidthAndHeight;
     }
 
@@ -90,6 +105,20 @@ public partial class SettingWindow : Window
             AISettings.Instance.AIName = temp.AIName;
             AISettings.Instance.SysPrompt = temp.SysPrompt;
             AISettings.Instance.ContextMessages = _contextMessages.ToList();
+
+            // 保存AI参数
+            AISettings.Instance.Temperature = temp.Temperature;
+            AISettings.Instance.MaxTokens = temp.MaxTokens;
+            AISettings.Instance.TopP = temp.TopP;
+            AISettings.Instance.TopK = temp.TopK;
+            AISettings.Instance.RepetitionPenalty = temp.RepetitionPenalty;
+            AISettings.Instance.FrequencyPenalty = temp.FrequencyPenalty;
+            AISettings.Instance.PresencePenalty = temp.PresencePenalty;
+            AISettings.Instance.ContextWindowSize = temp.ContextWindowSize;
+
+            // 保存新增的设置项
+            AISettings.Instance.EnableAdvancedSettings = temp.EnableAdvancedSettings;
+            AISettings.Instance.EnableLogging = temp.EnableLogging;
         }
         AISettings.Instance.SaveSettings();
     }
