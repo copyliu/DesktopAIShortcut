@@ -4,82 +4,106 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 
-namespace DesktopAIShortcut;
-
-public partial class App : Application
+namespace DesktopAIShortcut
 {
-    public override void Initialize()
+    public partial class App : Application
     {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    private ApplicationViewModel context;
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        public override void Initialize()
         {
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            context = new ApplicationViewModel();
+            AvaloniaXamlLoader.Load(this);
         }
-        base.OnFrameworkInitializationCompleted();
-    }
 
-    private void Exit_OnClick(object? sender, EventArgs e)
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        private ApplicationViewModel context;
+
+        public override void OnFrameworkInitializationCompleted()
         {
-            desktop.Shutdown();
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                context = new ApplicationViewModel();
+            }
+            base.OnFrameworkInitializationCompleted();
         }
-    }
 
-    private void TrayIcon_OnClicked(object? sender, EventArgs e)
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        private void Exit_OnClick(object? sender, EventArgs e)
         {
-            context?.ShowWindow();
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
+        }
+
+        private void TrayIcon_OnClicked(object? sender, EventArgs e)
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                context?.ShowWindow();
+
 #if WINDOWS
-            Avalonia.Platform.Screen screen = desktop.MainWindow.Screens.Primary;
+                var screen = desktop.MainWindow.Screens.Primary;
+                var scaling = screen.Scaling;  // 使用新的 Scaling 属性
+                var p = System.Windows.Forms.Cursor.Position;
 
-            var p = System.Windows.Forms.Cursor.Position;
-            if (p.Y > screen.WorkingArea.Y)
-            {
-                //任务栏在底部
-                var windowY = p.Y - 500 - 50; // 增加额外的80像素偏移，避免被任务栏遮挡
-                var windowX = p.X - 150;
+                // 考虑缩放后的窗口实际尺寸
+                double scaledWidth = 500 * scaling;
+                double scaledHeight = 300 * scaling;
 
-                if (windowX + 500 > screen.WorkingArea.Right)
+                // 获取窗口的实际像素尺寸
+                var windowBounds = desktop.MainWindow.Bounds;
+                double actualWidth = windowBounds.Width * scaling;
+                double actualHeight = windowBounds.Height * scaling;
+
+                if (p.Y > screen.WorkingArea.Y)
                 {
-                    windowX = screen.WorkingArea.Right - 500;
+                    //任务栏在底部
+                    double windowY = (screen.WorkingArea.Bottom - actualHeight);  // 
+                    //double windowX = p.X - (scaledWidth / 2);  // 居中显示
+                    double windowX = p.X * scaling;
+
+                    // 确保窗口不会超出屏幕右边界
+                    if ((windowX + actualWidth) > (screen.WorkingArea.Right))
+                    {
+                        windowX = (screen.WorkingArea.Right - actualWidth);
+                    }
+
+                    // 确保窗口不会超出屏幕左边界
+                    if (windowX < screen.WorkingArea.X)
+                    {
+                        windowX = screen.WorkingArea.X + 10;
+                    }
+
+                    context?.SetWindowPosition((int)(windowX), (int)(windowY));
                 }
-                if (windowX < screen.WorkingArea.X)
+                else
                 {
-                    windowX = screen.WorkingArea.X;
+                    //任务栏在顶部
+                    double windowY = screen.WorkingArea.Y + 10;  // 添加10像素的边距
+                    double windowX = p.X - (actualWidth / 2);  // 居中显示
+
+                    // 确保窗口不会超出屏幕右边界
+                    if (windowX + scaledWidth > screen.WorkingArea.Right)
+                    {
+                        windowX = screen.WorkingArea.Right - actualWidth - 10;
+                    }
+
+                    // 确保窗口不会超出屏幕左边界
+                    if (windowX < screen.WorkingArea.X)
+                    {
+                        windowX = screen.WorkingArea.X + 10;
+                    }
+
+                    context?.SetWindowPosition((int)(windowX), (int)(windowY));
                 }
-                context?.SetWindowPosition(windowX, windowY);
-            }
-            else
-            {
-                //任务栏在顶部
-                var windowY = screen.WorkingArea.Y;
-                var windowX = p.X - 150;
-                if (windowX + 500 > screen.WorkingArea.Right)
-                {
-                    windowX = screen.WorkingArea.Right - 500;
-                }
-                if (windowX < screen.WorkingArea.X)
-                {
-                    windowX = screen.WorkingArea.X;
-                }
-                context?.SetWindowPosition(windowX, windowY);
-            }
 #endif
+            }
         }
-    }
 
-    private void Setting_clicked(object? sender, EventArgs e)
-    {
-        var settingWindow = new SettingWindow();
-        settingWindow.Show();
+        private void Setting_clicked(object? sender, EventArgs e)
+        {
+            var settingWindow = new SettingWindow();
+            settingWindow.Show();
+        }
     }
 }
