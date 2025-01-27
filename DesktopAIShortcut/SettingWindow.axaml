@@ -25,22 +25,22 @@
 	</Window.Resources>
 	<ScrollViewer>
 		<StackPanel Margin="10" x:DataType="desktopAiShortcut:AISettings">
-			<StackPanel Orientation="Horizontal">
-				<Label Content="AI名称" Width="150"/>
-				<TextBox Text="{Binding AIName}" Width="200"/>
-			</StackPanel>
-			<StackPanel Orientation="Horizontal">
-				<Label Content="模型名称" Width="150"/>
-				<TextBox Text="{Binding Model}" Width="200"/>
-			</StackPanel>
-			<StackPanel Orientation="Horizontal">
-				<Label Content="OpenAI兼容接口地址" Width="150"/>
-				<TextBox Text="{Binding Endpoint}" Width="200"/>
-			</StackPanel>
-			<StackPanel Orientation="Horizontal">
-				<Label Content="密钥" Width="150"/>
-				<TextBox Text="{Binding Key}" Width="200"/>
-			</StackPanel>
+			<DockPanel >
+				<Label DockPanel.Dock="Left" Content="AI名称" Width="150" VerticalAlignment="Center"/>
+				<TextBox DockPanel.Dock="Right" Text="{Binding AIName}" MinWidth="200"/>
+			</DockPanel>
+			<DockPanel >
+				<Label DockPanel.Dock="Left" Content="模型名称" Width="150" VerticalAlignment="Center"/>
+				<TextBox DockPanel.Dock="Right"  Text="{Binding Model}" MinWidth="200"/>
+			</DockPanel>
+			<DockPanel >
+				<Label DockPanel.Dock="Left" Content="OpenAI兼容接口地址" Width="150" VerticalAlignment="Center"/>
+				<TextBox DockPanel.Dock="Right"  Text="{Binding Endpoint}" MinWidth="200"/>
+			</DockPanel>
+			<DockPanel  >
+				<Label DockPanel.Dock="Left" Content="密钥" Width="150" VerticalAlignment="Center"/>
+				<TextBox DockPanel.Dock="Right"  Text="{Binding Key}" MinWidth="200"/>
+			</DockPanel>
 
 			<Border BorderBrush="Gray" BorderThickness="1" Margin="0,10" Padding="10">
 				<DockPanel>
