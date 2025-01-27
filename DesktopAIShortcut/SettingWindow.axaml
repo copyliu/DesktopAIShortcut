@@ -5,7 +5,7 @@
         xmlns:desktopAiShortcut="clr-namespace:DesktopAIShortcut"
         xmlns:models="clr-namespace:DesktopAIShortcut.Models"
         xmlns:converters="using:DesktopAIShortcut.Converters"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
         x:Class="DesktopAIShortcut.SettingWindow"
         Title="设置">
 	<Window.Styles>
@@ -68,90 +68,87 @@
 
 					<!-- 高级参数折叠部分 -->
 					<Expander Header="高级参数设置" IsExpanded="False" Margin="0,10,0,0">
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*"/>
-								<ColumnDefinition Width="*"/>
-							</Grid.ColumnDefinitions>
+						<StackPanel Orientation="Horizontal">
+							
 
 							<!-- 左列参数 -->
 							<StackPanel Grid.Column="0" Margin="0,0,10,0">
-								<StackPanel Orientation="Horizontal">
-									<Label Content="最大生成长度" Width="150">
+								<DockPanel>
+									<Label Content="最大生成长度" Width="150"  HorizontalAlignment="Stretch">
 										<ToolTip.Tip>限制AI一次回复最多生成的token数量</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding MaxTokens}"
-												 Minimum="1" Maximum="100000"
+												 Minimum="1" Maximum="100000" 
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel >
 									<Label Content="温度 (0-2)" Width="150">
 										<ToolTip.Tip>控制输出的随机性，值越高输出越随机，值越低输出越确定</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding Temperature}"
 												 Minimum="0" Maximum="2" Increment="0.1"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel>
 									<Label Content="Top-p (0-1)" Width="150">
 										<ToolTip.Tip>控制词汇采样的概率阈值，降低可以让输出更加集中</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding TopP}"
 												 Minimum="0" Maximum="1" Increment="0.1"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel  >
 									<Label Content="存在惩罚 (-2-2)" Width="150">
 										<ToolTip.Tip>基于词汇是否在历史中出现的惩罚</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding PresencePenalty}"
 												 Minimum="-2" Maximum="2" Increment="0.1"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 							</StackPanel>
 
 							<!-- 右列参数 -->
 							<StackPanel Grid.Column="1">
-								<StackPanel Orientation="Horizontal">
+								<DockPanel >
 									<Label Content="Top-k（不支持）" Width="150">
 										<ToolTip.Tip>限制每次采样时考虑的词汇数量</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding TopK}"
 												 Minimum="1" Maximum="100"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel >
 									<Label Content="重复惩罚 (1-2)（不支持）" Width="150">
 										<ToolTip.Tip>对重复内容的惩罚程度，值越大越不容易重复</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding RepetitionPenalty}"
 												 Minimum="1" Maximum="2" Increment="0.1"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel  >
 									<Label Content="频率惩罚 (-2-2)" Width="150">
 										<ToolTip.Tip>基于词汇在历史中出现频率的惩罚</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding FrequencyPenalty}"
 												 Minimum="-2" Maximum="2" Increment="0.1"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 
-								<StackPanel Orientation="Horizontal">
+								<DockPanel  >
 									<Label Content="上下文窗口大小（不支持）" Width="150">
 										<ToolTip.Tip>AI能记住的上下文token数量</ToolTip.Tip>
 									</Label>
 									<NumericUpDown Value="{Binding ContextWindowSize}"
 												 Minimum="1" Maximum="2000000"
 												 IsEnabled="{Binding EnableAdvancedSettings}"/>
-								</StackPanel>
+								</DockPanel>
 							</StackPanel>
-						</Grid>
+						</StackPanel>
 					</Expander>
 				</StackPanel>
 			</Border>

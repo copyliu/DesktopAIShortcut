@@ -159,7 +159,7 @@ public partial class MainWindow : Window
 
     private void InputElement_OnKeyUp(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if (e.Key == Key.Enter && e.KeyModifiers==KeyModifiers.Control)
         {
             this.SendBtn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }

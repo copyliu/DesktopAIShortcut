@@ -30,7 +30,7 @@
 		<!-- 左侧历史列表 -->
 		<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="0,0,1,0">
 			<DockPanel>
-				<Button DockPanel.Dock="Top" Content="新对话" Click="NewChat_OnClick" HorizontalAlignment="Stretch" Margin="5"/>
+				<Button DockPanel.Dock="Top" Content="新对话" Click="NewChat_OnClick" HorizontalAlignment="Stretch" Margin="2"/>
 				<ScrollViewer>
 					<ItemsControl x:Name="HistoryList">
 						<ItemsControl.ItemTemplate>
@@ -40,10 +40,11 @@
 										<ColumnDefinition Width="*"/>
 										<ColumnDefinition Width="Auto"/>
 									</Grid.ColumnDefinitions>
-									<Button Grid.Column="0"
+									<Button Grid.Column="0" Grid.ColumnSpan="2"
                                             Click="HistoryItem_OnClick"
                                             HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Left">
+                                            VerticalAlignment="Stretch"
+                                            VerticalContentAlignment="Center">
 										<StackPanel>
 											<TextBlock Text="{Binding Title}"
                                                        TextTrimming="CharacterEllipsis"/>
@@ -53,6 +54,7 @@
 										</StackPanel>
 									</Button>
 									<Button Grid.Column="1"
+									        VerticalAlignment="Top"
                                             Click="DeleteHistory_OnClick"
                                             Content="×"
                                             Margin="2,0,0,0"
@@ -77,7 +79,7 @@
 		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True">
 			<DockPanel DockPanel.Dock="Bottom">
 				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"/>
-				<TextBox Text="" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"/>
+				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"/>
 			</DockPanel>
 			<ScrollViewer x:Name="ScrollViewer">
 				<StackPanel>
