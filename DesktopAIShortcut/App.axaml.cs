@@ -47,11 +47,13 @@ namespace DesktopAIShortcut
                 var p = System.Windows.Forms.Cursor.Position;
 
                 // 考虑缩放后的窗口实际尺寸
-                double scaledWidth = 500 * scaling;
-                double scaledHeight = 300 * scaling;
+                // double scaledWidth = 500 * scaling;
+                // double scaledHeight = 300 * scaling;
+
 
                 // 获取窗口的实际像素尺寸
                 var windowBounds = desktop.MainWindow.Bounds;
+                
                 double actualWidth = windowBounds.Width * scaling;
                 double actualHeight = windowBounds.Height * scaling;
 
@@ -83,7 +85,7 @@ namespace DesktopAIShortcut
                     double windowX = p.X - (actualWidth / 2);  // 居中显示
 
                     // 确保窗口不会超出屏幕右边界
-                    if (windowX + scaledWidth > screen.WorkingArea.Right)
+                    if (windowX + actualWidth > screen.WorkingArea.Right)
                     {
                         windowX = screen.WorkingArea.Right - actualWidth - 10;
                     }

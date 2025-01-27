@@ -75,10 +75,10 @@
                       HorizontalAlignment="Center"/>
 
 		<!-- 右侧聊天区域 -->
-		<Label Grid.Row="0" Grid.Column="2" Content="桌面AI小助手"/>
+		<Label Grid.Row="0" Grid.Column="2"  Content="桌面AI小助手"  VerticalAlignment="Center"/>
 		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True">
-			<DockPanel DockPanel.Dock="Bottom">
-				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"/>
+			<DockPanel DockPanel.Dock="Bottom"  >
+				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"  VerticalContentAlignment="Stretch"/>
 				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"/>
 			</DockPanel>
 			<ScrollViewer x:Name="ScrollViewer">

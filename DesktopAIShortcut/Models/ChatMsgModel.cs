@@ -47,7 +47,7 @@ public class ChatMsgModel:INotifyPropertyChanged
                 return "";
                 
             }
-            return "<div id=\"mainmd\">"+ Markdig.Markdown.ToHtml(Markdown,pipeline)+ "</div>";
+            return "<div id=\"mainmd\" class=\"markdown-body\">" + Markdig.Markdown.ToHtml(Markdown,pipeline)+ "</div>";
         }
     }
     

@@ -7,15 +7,15 @@ namespace DesktopAIShortcut;
 public partial class ApplicationViewModel
 {
     private readonly MainWindow _mainWindow;
-    private const int DefaultWidth = 500;
-    private const int DefaultHeight = 300;
+    public const int DefaultWidth = 500;
+    public const int DefaultHeight = 300;
 
     public ApplicationViewModel()
     {
         _mainWindow = new MainWindow
         {
             SizeToContent = SizeToContent.Manual,
-            CanResize = false,
+            CanResize = true,
             Width = DefaultWidth,
             Height = DefaultHeight,
             WindowStartupLocation = WindowStartupLocation.Manual
@@ -47,8 +47,8 @@ public partial class ApplicationViewModel
 
     public void SetWindowPosition(int windowX, int windowY)
     {
-        _mainWindow.Width = DefaultWidth;
-        _mainWindow.Height = DefaultHeight;
+        // _mainWindow.Width = DefaultWidth;
+        // _mainWindow.Height = DefaultHeight;
 
         // 确保在设置位置之前窗口已经初始化但未显示
         if (!_mainWindow.IsVisible)
