@@ -1,0 +1,157 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DesktopAIShortcut.ViewModels"
+             xmlns:models="clr-namespace:DesktopAIShortcut.Models"
+             xmlns:viewModels="clr-namespace:DesktopAIShortcut.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DesktopAIShortcut.Settings.PromptTemplatesSettingsControl"
+             x:DataType="viewModels:PromptTemplatesViewModel">
+    
+    <UserControl.DataContext>
+        <vm:PromptTemplatesViewModel/>
+    </UserControl.DataContext>
+    
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- 标题 -->
+        <TextBlock Grid.Row="0" Text="提示词模版设置" FontSize="20" FontWeight="Bold"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,15,0,15"/>
+        
+        <!-- 主要内容区 -->
+        <Grid Grid.Row="1" ColumnDefinitions="250,*" Margin="10">
+            <!-- 左侧模板列表 -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                <Grid Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                    <TextBox Grid.Column="0" Watermark="新模板名称" Text="{Binding NewTemplateName}"/>
+                    <Button Grid.Column="1" Content="+" Width="30" Margin="5,0,0,0"
+                            Command="{Binding AddNewTemplate}"/>
+                </Grid>
+                
+                <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                    <ListBox ItemsSource="{Binding PromptTemplates}"
+                             SelectedItem="{Binding SelectedTemplate}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="✓" Margin="5,0,0,0" IsVisible="{Binding IsDefault}" 
+                                               Foreground="Green" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Grid>
+            
+            <!-- 右侧模板详情 -->
+            <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" Margin="10,0,0,0" Padding="10" CornerRadius="5">
+                <ScrollViewer IsVisible="{Binding SelectedTemplate, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBox Grid.Column="0" Text="{Binding SelectedTemplate.Name}" FontSize="16" FontWeight="Bold"/>
+                            <Button Grid.Column="1" Content="删除" Foreground="Red" Margin="5,0,0,0" 
+                                    Command="{Binding DeleteSelectedTemplate}"
+                                    IsEnabled="{Binding !SelectedTemplate.IsDefault}"/>
+                        </Grid>
+                        
+                        <!-- 系统提示词 -->
+                        <TextBlock Text="系统提示词" Margin="0,10,0,0" FontWeight="SemiBold"/>
+                        <TextBox Text="{Binding SelectedTemplate.SystemPrompt}" MinHeight="100" AcceptsReturn="True" TextWrapping="Wrap"/>
+                        
+                        <!-- 前置上下文消息 -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                            <TextBlock Grid.Column="0" Text="前置上下文消息" FontWeight="SemiBold"/>
+                            <Button Grid.Column="1" Content="+" Width="30" 
+                                    Command="{Binding AddPrefixMessageCommand}"/>
+                        </Grid>
+                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" MinHeight="100" Padding="5">
+                            <Grid ColumnDefinitions="250,*">
+                                <!-- 左侧消息列表 -->
+                                <ListBox Grid.Column="0" ItemsSource="{Binding SelectedTemplate.PrefixMessages}"
+                                        SelectedItem="{Binding SelectedPrefixMessage}" Margin="0,0,5,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Role}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <!-- 右侧消息编辑区 -->
+                                <StackPanel Grid.Column="1" IsVisible="{Binding SelectedPrefixMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <ComboBox HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedPrefixMessage.Role}" Margin="0,0,0,5">
+                                        <ComboBoxItem Content="{x:Static models:ChatRole.User}"/>
+                                        <ComboBoxItem Content="{x:Static models:ChatRole.Assistant}"/>
+                                    </ComboBox>
+                                    <TextBox Text="{Binding SelectedPrefixMessage.Content}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
+                                    <Button Content="删除此消息" HorizontalAlignment="Right" Margin="0,5,0,0"
+                                            Command="{Binding RemovePrefixMessageCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- 后置上下文消息 -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                            <TextBlock Grid.Column="0" Text="后置上下文消息" FontWeight="SemiBold"/>
+                            <Button Grid.Column="1" Content="+" Width="30" 
+                                    Command="{Binding AddSuffixMessageCommand}"/>
+                        </Grid>
+                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" MinHeight="100" Padding="5">
+                            <Grid ColumnDefinitions="250,*">
+                                <!-- 左侧消息列表 -->
+                                <ListBox Grid.Column="0" ItemsSource="{Binding SelectedTemplate.SuffixMessages}"
+                                        SelectedItem="{Binding SelectedSuffixMessage}" Margin="0,0,5,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Role}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <!-- 右侧消息编辑区 -->
+                                <StackPanel Grid.Column="1" IsVisible="{Binding SelectedSuffixMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <ComboBox HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedSuffixMessage.Role}" Margin="0,0,0,5">
+                                        <ComboBoxItem Content="{x:Static models:ChatRole.User}"/>
+                                        <ComboBoxItem Content="{x:Static models:ChatRole.Assistant}"/>
+                                    </ComboBox>
+                                    <TextBox Text="{Binding SelectedSuffixMessage.Content}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
+                                    <Button Content="删除此消息" HorizontalAlignment="Right" Margin="0,5,0,0"
+                                            Command="{Binding RemoveSuffixMessageCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- 模型参数设置 -->
+                        <Expander Header="模型参数" Margin="0,10,0,0" IsExpanded="True">
+                            <StackPanel Spacing="10" Margin="0,10,0,0">
+                                <!-- 温度设置 -->
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <TextBlock Grid.Column="0" Text="温度:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.1" 
+                                            Value="{Binding SelectedTemplate.Temperature}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding SelectedTemplate.Temperature, StringFormat={}{0:F1}}" 
+                                               VerticalAlignment="Center" Margin="10,0,0,0" Width="30"/>
+                                </Grid>
+                                
+                                <!-- 最大令牌数 -->
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <TextBlock Grid.Column="0" Text="最大令牌数:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <Slider Grid.Column="1" Minimum="100" Maximum="4000" TickFrequency="100" 
+                                            Value="{Binding SelectedTemplate.MaxTokens}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding SelectedTemplate.MaxTokens}" 
+                                               VerticalAlignment="Center" Margin="10,0,0,0" Width="40"/>
+                                </Grid>
+                                
+                                <!-- 设为默认 -->
+                                <CheckBox Content="设为默认模板" IsChecked="{Binding SelectedTemplate.IsDefault}"/>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        
+        <!-- 底部按钮区 -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,10,10">
+            <Button Content="保存设置" Command="{Binding SaveTemplates}" Width="100"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

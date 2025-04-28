@@ -2,8 +2,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:local="clr-namespace:DesktopAIShortcut"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
         x:Class="DesktopAIShortcut.SettingWindow"
-        Title="SettingWindow">
-    Welcome to Avalonia!
+        Title="设置" Width="800" Height="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- 左侧选项列表 -->
+        <ListBox Name="SettingsList" Grid.Column="0" Margin="5" 
+                 SelectionChanged="SettingsList_OnSelectionChanged">
+            <ListBoxItem Content="大模型供应商" Tag="ModelProviders" />
+            <ListBoxItem Content="提示词预设" Tag="PromptTemplates" />
+            <ListBoxItem Content="MCP服务" Tag="McpServices" />
+            <ListBoxItem Content="联网搜索" Tag="WebSearch" />
+            <ListBoxItem Content="一般设置" Tag="GeneralSettings" />
+        </ListBox>
+        
+        <!-- 右侧内容区域 -->
+        <ContentControl Grid.Column="1" Margin="10" Name="ContentArea" />
+    </Grid>
 </Window>

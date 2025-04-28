@@ -187,7 +187,7 @@ public partial class MainWindow : Window
 
         try
         {
-            var messages = new List<ChatMessage>();
+            var messages = new List<OpenAI.Chat.ChatMessage>();
             // 添加聊天前的预定义消息
             messages.AddRange(AISettings.Instance.ContextMessages
                 .Where(m => m.IsBeforeChat)

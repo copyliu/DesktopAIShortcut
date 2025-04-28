@@ -14,7 +14,7 @@ public class ChatMsgModel:INotifyPropertyChanged
     private string _userName;
     private string _markdown;
     public bool IsUser { get; set; }
-    public ChatMessage ChatMessage {
+    public OpenAI.Chat.ChatMessage ChatMessage {
         get
         {
             if (IsUser)

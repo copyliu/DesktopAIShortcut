@@ -88,7 +88,7 @@ namespace DesktopAIShortcut.Models
         }
 
         [JsonIgnore]
-        public ChatMessage ChatMessage => Role.ToLower() switch
+        public OpenAI.Chat.ChatMessage ChatMessage => Role.ToLower() switch
         {
             "system" => new SystemChatMessage(Content),
             "assistant" => new AssistantChatMessage(Content),

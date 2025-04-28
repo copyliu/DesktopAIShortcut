@@ -104,7 +104,7 @@ namespace DesktopAIShortcut
 
         private void Setting_clicked(object? sender, EventArgs e)
         {
-            var settingWindow = new SettingWindowOld();
+            var settingWindow = new SettingWindow();
             settingWindow.Show();
         }
     }
