@@ -19,7 +19,7 @@
                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,15,0,15"/>
         
         <!-- 主要内容区 -->
-        <Grid Grid.Row="1" ColumnDefinitions="250,*" Margin="10">
+        <Grid Grid.Row="1" ColumnDefinitions="200,*" Margin="10">
             <!-- 左侧模板列表 -->
             <Grid Grid.Column="0" RowDefinitions="Auto,*">
                 <Grid Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
@@ -45,9 +45,9 @@
             </Grid>
             
             <!-- 右侧模板详情 -->
-            <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" Margin="10,0,0,0" Padding="10" CornerRadius="5">
-                <ScrollViewer IsVisible="{Binding SelectedTemplate, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <StackPanel Spacing="10">
+            <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" Margin="10,0,0,0"  CornerRadius="5">
+                <ScrollViewer IsVisible="{Binding SelectedTemplate, Converter={x:Static ObjectConverters.IsNotNull}} " >
+                    <StackPanel Spacing="10"  Margin="10">
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBox Grid.Column="0" Text="{Binding SelectedTemplate.Name}" FontSize="16" FontWeight="Bold"/>
                             <Button Grid.Column="1" Content="删除" Foreground="Red" Margin="5,0,0,0" 
@@ -120,7 +120,7 @@
                         </Border>
                         
                         <!-- 模型参数设置 -->
-                        <Expander Header="模型参数" Margin="0,10,0,0" IsExpanded="True">
+                        <Expander Header="模型参数" Margin="0,10,0,0" IsExpanded="True" HorizontalAlignment="Stretch">
                             <StackPanel Spacing="10" Margin="0,10,0,0">
                                 <!-- 温度设置 -->
                                 <Grid ColumnDefinitions="Auto,*,Auto">
