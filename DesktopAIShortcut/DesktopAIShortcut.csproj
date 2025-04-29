@@ -15,14 +15,13 @@
 	    <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
         <TargetFramework>net9.0-windows</TargetFramework>
 
     </PropertyGroup>
-   <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
-       <UseWindowsForms>true</UseWindowsForms>
+        <UseWindowsForms>true</UseWindowsForms>
        <OutputType>WinExe</OutputType>
-   </PropertyGroup>
+    </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
