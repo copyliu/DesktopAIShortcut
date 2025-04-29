@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 
 namespace DesktopAIShortcut.Models
 {
@@ -10,8 +11,9 @@ namespace DesktopAIShortcut.Models
         private string _apiKey;
         private bool _isEnabled;
         private string _apiEndpoint;
-        private string _selectedModel;
-        private List<string> _availableModels;
+        private ObservableCollection<string> _selectedModels;
+        private ObservableCollection<string> _availableModels;
+        private string _customModelInput;
 
         public string Name
         {
@@ -37,16 +39,29 @@ namespace DesktopAIShortcut.Models
             set => SetProperty(ref _apiEndpoint, value);
         }
 
-        public string SelectedModel
+        public ObservableCollection<string> SelectedModels
         {
-            get => _selectedModel;
-            set => SetProperty(ref _selectedModel, value);
+            get => _selectedModels;
+            set => SetProperty(ref _selectedModels, value);
         }
 
-        public List<string> AvailableModels
+        public ObservableCollection<string> AvailableModels
         {
             get => _availableModels;
             set => SetProperty(ref _availableModels, value);
+        }
+
+        public string CustomModelInput
+        {
+            get => _customModelInput;
+            set => SetProperty(ref _customModelInput, value);
+        }
+
+        public ModelProvider()
+        {
+            SelectedModels = new ObservableCollection<string>();
+            AvailableModels = new ObservableCollection<string>();
+            CustomModelInput = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
