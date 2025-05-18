@@ -11,6 +11,7 @@ namespace DesktopAIShortcut
 {
     [JsonSourceGenerationOptions(WriteIndented = true)]
     [JsonSerializable(typeof(AISettings))]
+    [JsonSerializable(typeof(ApplicationConfig))]
     [JsonSerializable(typeof(ContextMessage))]
     internal partial class SourceGenerationContext : JsonSerializerContext
     {

@@ -5,7 +5,7 @@
              RequestedThemeVariant="Default">
     <Application.Resources>
         <ResourceDictionary>
-            <global:ModelSelectionConverter x:Key="ModelSelectionConverter"/>
+            <global:ModelSelectionMultiConverter x:Key="ModelSelectionMultiConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 

@@ -62,13 +62,17 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <CheckBox Content="{Binding}"
-                                              IsChecked="{Binding ((viewModels:ModelProvidersSettingsViewModel)DataContext).SelectedProvider.SelectedModels, 
-                                                                  RelativeSource={RelativeSource AncestorType=UserControl}, 
-                                                                  Converter={StaticResource ModelSelectionConverter}, 
-                                                                  ConverterParameter={Binding}}" 
+                                             
                                               Command="{Binding ((viewModels:ModelProvidersSettingsViewModel)DataContext).ToggleModelSelection, 
                                                                   RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                              CommandParameter="{Binding}" />
+                                              CommandParameter="{Binding}" >
+                                        <CheckBox.IsChecked>
+                                            <MultiBinding Converter="{StaticResource ModelSelectionMultiConverter}">
+                                                <Binding Path="((viewModels:ModelProvidersSettingsViewModel)DataContext).SelectedProvider.SelectedModels" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </CheckBox.IsChecked>
+                                    </CheckBox>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -88,7 +92,7 @@
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"/>
                                         <Button Grid.Column="1" Content="移除" 
-                                                Command="{Binding $parent.((viewModels:ModelProvidersSettingsViewModel)DataContext).RemoveSelectedModel}" 
+                                                Command="{Binding ((viewModels:ModelProvidersSettingsViewModel)DataContext).RemoveSelectedModel, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                 CommandParameter="{Binding}"/>
                                     </Grid>
                                 </DataTemplate>

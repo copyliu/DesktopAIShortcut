@@ -42,7 +42,15 @@ namespace DesktopAIShortcut.Models
         public ObservableCollection<string> SelectedModels
         {
             get => _selectedModels;
-            set => SetProperty(ref _selectedModels, value);
+            set
+            {
+                if (_selectedModels != null)
+                    _selectedModels.CollectionChanged -= SelectedModels_CollectionChanged;
+                SetProperty(ref _selectedModels, value);
+                if (_selectedModels != null)
+                    _selectedModels.CollectionChanged += SelectedModels_CollectionChanged;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedModels)));
+            }
         }
 
         public ObservableCollection<string> AvailableModels
@@ -62,6 +70,12 @@ namespace DesktopAIShortcut.Models
             SelectedModels = new ObservableCollection<string>();
             AvailableModels = new ObservableCollection<string>();
             CustomModelInput = string.Empty;
+            // CollectionChanged 事件已在 setter 绑定
+        }
+
+        private void SelectedModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedModels)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

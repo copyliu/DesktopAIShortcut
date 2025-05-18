@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using DesktopAIShortcut.Models;
 
 namespace DesktopAIShortcut
 {
@@ -12,6 +13,7 @@ namespace DesktopAIShortcut
     {
         public override void Initialize()
         {
+           ApplicationConfig.LoadSettings();
             AvaloniaXamlLoader.Load(this);
         }
 
