@@ -6,6 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <global:ModelSelectionMultiConverter x:Key="ModelSelectionMultiConverter"/>
+            <global:EnumDescriptionConverter x:Key="enumConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

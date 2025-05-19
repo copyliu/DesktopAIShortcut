@@ -10,6 +10,7 @@ using Avalonia.Data.Converters;
 using DesktopAIShortcut.Models;
 using Avalonia.Threading;
 using System.Linq;
+using System.Reflection;
 using DesktopAIShortcut.ViewModels;
 
 namespace DesktopAIShortcut.ViewModels
@@ -20,6 +21,13 @@ namespace DesktopAIShortcut.ViewModels
         private ModelProvider _selectedProvider;
         private bool _isTesting;
 
+        public ObservableCollection<ApplicationConfig.AIEndpointType> ProviderTypes { get; }=
+        [
+            ApplicationConfig.AIEndpointType.OpenAI,
+            ApplicationConfig.AIEndpointType.Gemini,
+            ApplicationConfig.AIEndpointType.OLLAMA
+        ];
+        
         public ObservableCollection<ModelProvider> Providers
         {
             get => _providers;
@@ -51,19 +59,37 @@ namespace DesktopAIShortcut.ViewModels
             // 初始化提供商列表 
             Providers = new ObservableCollection<ModelProvider>();
             
-            foreach (var provider in ApplicationConfig.Provider.ProviderTemplates)
+            foreach (var templateProvider in ApplicationConfig.Provider.ProviderTemplates)
             {
-                var selected = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderName == provider.Key);
+                var selected = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderName == templateProvider.Key);
                 
                 var modelProvider = new ModelProvider
                 {
-                    Name = provider.Value.Name,
+                    Name = templateProvider.Value.Name,
                     IsEnabled = selected?.Enabled==true,
-                    ApiEndpoint = selected?.Endpoint ?? provider.Value.Endpoint,
-                    AvailableModels = new ObservableCollection<string>(provider.Value.Model),
+                    ApiEndpoint = selected?.Endpoint ?? templateProvider.Value.Endpoint,
+                    AvailableModels = new ObservableCollection<string>(templateProvider.Value.Model.Concat(selected?.Model ?? new string[] { })),
                     SelectedModels = new ObservableCollection<string>(selected?.Model ?? new string[] { }),
                     ApiKey = selected?.Key ?? "",
-                    
+                    EndpointType = templateProvider.Value.Type  ,
+                    FromTemplate =true,
+                };
+                
+                Providers.Add(modelProvider);
+            }
+
+            foreach (var provider in ApplicationConfig.Instance.Providers.Where(p=>!ApplicationConfig.Provider.ProviderTemplates.Keys.Contains(p.ProviderName)))
+            {
+                var modelProvider = new ModelProvider
+                {
+                    Name = provider.Name,
+                    IsEnabled = provider.Enabled==true,
+                    ApiEndpoint = provider.Endpoint  ,
+                    AvailableModels = new ObservableCollection<string>( provider.Model ?? new string[] { }),
+                    SelectedModels = new ObservableCollection<string>(provider.Model ?? new string[] { }),
+                    ApiKey = provider.Key,
+                    EndpointType = provider.Type  ,
+                    FromTemplate =false,
                 };
                 
                 Providers.Add(modelProvider);
@@ -132,9 +158,9 @@ namespace DesktopAIShortcut.ViewModels
                     Model = provider.SelectedModels.ToArray(),
                     Enabled = provider.IsEnabled,
                     Name = provider.Name,
-                    Type = template?.Type?? ApplicationConfig.AIEndpointType.OpenAI,//TODO
+                    Type = template?.Type?? ApplicationConfig.AIEndpointType.OpenAI,
                     DefaultModel = provider.SelectedModels.FirstOrDefault()??"",
-                    
+                  
                 };
                 
                 providerList.Add(selectedProvider);
@@ -236,4 +262,44 @@ public class ModelSelectionMultiConverter : IMultiValueConverter
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         => throw new NotImplementedException();
+}
+
+
+public class EnumDescriptionConverter : IValueConverter
+{
+    private string GetEnumDescription(Enum enumObj)
+    {
+        FieldInfo fieldInfo = enumObj.GetType().GetField(enumObj.ToString());
+        object[] attribArray = fieldInfo.GetCustomAttributes(false);
+
+        if (attribArray.Length == 0)
+            return enumObj.ToString();
+        else
+        {
+            DescriptionAttribute attrib = null;
+
+            foreach (var att in attribArray)
+            {
+                if (att is DescriptionAttribute)
+                    attrib = att as DescriptionAttribute;
+            }
+
+            if (attrib != null)
+                return attrib.Description;
+
+            return enumObj.ToString();
+        }
+    }
+
+    object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        Enum myEnum = (Enum)value;
+        string description = GetEnumDescription(myEnum);
+        return description;
+    }
+
+    object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return string.Empty;
+    }
 }

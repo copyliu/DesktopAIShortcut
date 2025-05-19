@@ -15,6 +15,7 @@ using DesktopAIShortcut.Services;
 using OpenAI;
 using OpenAI.Chat;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace DesktopAIShortcut;
@@ -48,6 +49,14 @@ public partial class MainWindow : Window
             _historyService.SaveChat(_currentChat);
             RefreshHistoryList();
         };
+
+        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+           )
+        {
+            this.Background = Brushes.Transparent;
+        }
+        
     }
 
     public ChatMsgModel DefaultMsg => new ChatMsgModel()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace DesktopAIShortcut.Models;
@@ -13,10 +14,9 @@ public class ApplicationConfig
 
     public enum AIEndpointType
     {
-        OpenAI,
-
-        Gemini,
-        OLLAMA,
+        [Description("OpenAI兼容")] OpenAI,
+        [Description("Google Gemini兼容")] Gemini,
+        [Description("Ollama 本地模型兼容")] OLLAMA,
     }
 
     public class Provider
