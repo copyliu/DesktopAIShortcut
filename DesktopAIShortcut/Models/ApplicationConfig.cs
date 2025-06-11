@@ -184,6 +184,7 @@ public class ApplicationConfig
         public float FrequencyPenalty { get; set; } = 0.0f; // 默认频率惩罚为0
         public float PresencePenalty { get; set; } = 0.0f; // 默认存在惩罚为0
         public int ContextWindowSize { get; set; } = 4096; // 默认上下文窗口大小为4096
+        public bool IsDefault { get; set; } = false; // 是否为默认预设
     }
 
     public class RemoteMCPServer

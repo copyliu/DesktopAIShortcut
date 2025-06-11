@@ -27,45 +27,8 @@ namespace DesktopAIShortcut.Models
             set => SetProperty(ref _name, value);
         }
 
-        public string SystemPrompt
-        {
-            get => _systemPrompt;
-            set => SetProperty(ref _systemPrompt, value);
-        }
 
-        // 旧属性，保留用于兼容，实际使用PrefixMessages
-        public string PrefixPrompt
-        {
-            get => string.Join("\n", PrefixMessages.Select(m => $"{m.Role}: {m.Content}"));
-            set 
-            {
-                if (!string.IsNullOrEmpty(value) && PrefixMessages.Count == 0)
-                {
-                    PrefixMessages.Add(new ChatMessage 
-                    { 
-                        Role = ChatRole.User, 
-                        Content = value 
-                    });
-                }
-            }
-        }
-
-        // 旧属性，保留用于兼容，实际使用SuffixMessages
-        public string SuffixPrompt
-        {
-            get => string.Join("\n", SuffixMessages.Select(m => $"{m.Role}: {m.Content}"));
-            set 
-            {
-                if (!string.IsNullOrEmpty(value) && SuffixMessages.Count == 0)
-                {
-                    SuffixMessages.Add(new ChatMessage 
-                    { 
-                        Role = ChatRole.User, 
-                        Content = value 
-                    });
-                }
-            }
-        }
+      
 
         public ObservableCollection<ChatMessage> PrefixMessages
         {

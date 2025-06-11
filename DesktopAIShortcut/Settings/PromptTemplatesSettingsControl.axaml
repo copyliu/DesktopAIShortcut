@@ -55,10 +55,7 @@
                                     IsEnabled="{Binding !SelectedTemplate.IsDefault}"/>
                         </Grid>
                         
-                        <!-- 系统提示词 -->
-                        <TextBlock Text="系统提示词" Margin="0,10,0,0" FontWeight="SemiBold"/>
-                        <TextBox Text="{Binding SelectedTemplate.SystemPrompt}" MinHeight="100" AcceptsReturn="True" TextWrapping="Wrap"/>
-                        
+                     
                         <!-- 前置上下文消息 -->
                         <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
                             <TextBlock Grid.Column="0" Text="前置上下文消息" FontWeight="SemiBold"/>
@@ -78,9 +75,10 @@
                                 </ListBox>
                                 <!-- 右侧消息编辑区 -->
                                 <StackPanel Grid.Column="1" IsVisible="{Binding SelectedPrefixMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                    <ComboBox HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedPrefixMessage.Role}" Margin="0,0,0,5">
-                                        <ComboBoxItem Content="{x:Static models:ChatRole.User}"/>
-                                        <ComboBoxItem Content="{x:Static models:ChatRole.Assistant}"/>
+                                    <ComboBox HorizontalAlignment="Stretch"  SelectedItem="{Binding SelectedPrefixMessage.Role  }"
+                                              ItemsSource="{Binding ChatRoles}"
+                                              Margin="0,0,0,5">
+                                        
                                     </ComboBox>
                                     <TextBox Text="{Binding SelectedPrefixMessage.Content}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
                                     <Button Content="删除此消息" HorizontalAlignment="Right" Margin="0,5,0,0"
@@ -108,9 +106,10 @@
                                 </ListBox>
                                 <!-- 右侧消息编辑区 -->
                                 <StackPanel Grid.Column="1" IsVisible="{Binding SelectedSuffixMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                    <ComboBox HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedSuffixMessage.Role}" Margin="0,0,0,5">
-                                        <ComboBoxItem Content="{x:Static models:ChatRole.User}"/>
-                                        <ComboBoxItem Content="{x:Static models:ChatRole.Assistant}"/>
+                                    <ComboBox HorizontalAlignment="Stretch"  SelectedValue="{Binding SelectedSuffixMessage.Role  }"
+                                              ItemsSource="{Binding ChatRoles}"
+                                              Margin="0,0,0,5">
+                                        
                                     </ComboBox>
                                     <TextBox Text="{Binding SelectedSuffixMessage.Content}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
                                     <Button Content="删除此消息" HorizontalAlignment="Right" Margin="0,5,0,0"
@@ -151,7 +150,9 @@
         
         <!-- 底部按钮区 -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,10,10">
-            <Button Content="保存设置" Command="{Binding SaveTemplates}" Width="100"/>
+            <Button Content="加载默认" Command="{Binding AddDefaultCommand}" Width="100"/>
+
+            <Button Content="保存设置" Command="{Binding SaveTemplatesCommand}" Width="100"/>
         </StackPanel>
     </Grid>
 </UserControl>

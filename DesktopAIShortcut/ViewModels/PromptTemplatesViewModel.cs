@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using DesktopAIShortcut.Commands;
@@ -10,6 +11,12 @@ namespace DesktopAIShortcut.ViewModels
 {
     public class PromptTemplatesViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<DesktopAIShortcut.Models.ChatRole> ChatRoles { get; }=
+        [
+            ChatRole.System,
+           ChatRole.Assistant,
+           ChatRole.User
+        ];
         private PromptTemplate _selectedTemplate;
         private string _newTemplateName;
         private ChatMessage _selectedPrefixMessage;
@@ -18,13 +25,59 @@ namespace DesktopAIShortcut.ViewModels
         public PromptTemplatesViewModel()
         {
             PromptTemplates = new ObservableCollection<PromptTemplate>();
-            LoadDefaultTemplates();
+
+            foreach (var instanceChatPreset in ApplicationConfig.Instance.ChatPresets)
+            {
+                var template = new PromptTemplate
+                {
+                    Name = instanceChatPreset.Name,
+                   PrefixMessages = new ObservableCollection<ChatMessage>( instanceChatPreset.ContextMessages.Where(p=>!p.IsBeforeChat)
+                       .OrderBy(p=>p.Order)
+                       
+                       .Select(p=>new ChatMessage()
+                       {
+                           Content = p.Content,
+                           Role = (ChatRole)p.RoleIndex
+                           
+                       })),
+                    Temperature = instanceChatPreset.Temperature,
+                    MaxTokens = instanceChatPreset.MaxTokens,
+                    IsDefault = instanceChatPreset.IsDefault,
+                 SuffixMessages =  new ObservableCollection<ChatMessage>( instanceChatPreset.ContextMessages.Where(p=>p.IsBeforeChat)
+                     .OrderBy(p=>p.Order)
+                       
+                     .Select(p=>new ChatMessage()
+                     {
+                         Content = p.Content,
+                         Role = (ChatRole)p.RoleIndex
+                           
+                     })),
+                };
+                PromptTemplates.Add(template);
+            }
+            
+            
+            
+            
 
             // 命令初始化
             AddPrefixMessageCommand = new RelayCommand(_ => AddPrefixMessage());
-            RemovePrefixMessageCommand = new RelayCommand(_ => RemovePrefixMessage(), _ => SelectedPrefixMessage != null);
+            RemovePrefixMessageCommand = new RelayCommand(_ => RemovePrefixMessage());
             AddSuffixMessageCommand = new RelayCommand(_ => AddSuffixMessage());
-            RemoveSuffixMessageCommand = new RelayCommand(_ => RemoveSuffixMessage(), _ => SelectedSuffixMessage != null);
+            RemoveSuffixMessageCommand = new RelayCommand(_ => RemoveSuffixMessage());
+
+
+
+            if (PromptTemplates.Count == 0)
+            {
+                AddDefault();
+                
+            }
+            
+            
+            
+            
+            SelectedTemplate = PromptTemplates[0];
         }
 
         public ObservableCollection<PromptTemplate> PromptTemplates { get; }
@@ -88,48 +141,45 @@ namespace DesktopAIShortcut.ViewModels
         public ICommand AddSuffixMessageCommand { get; }
         public ICommand RemoveSuffixMessageCommand { get; }
 
-        private void LoadDefaultTemplates()
+        public ICommand SaveTemplatesCommand => new RelayCommand(_ => SaveTemplates());
+        public ICommand AddDefaultCommand => new RelayCommand(_ => AddDefault());
+
+        private void AddDefault()
         {
             // 添加一些默认模板
             var generalTemplate = new PromptTemplate
             {
                 Name = "通用助手",
-                SystemPrompt = "你是一个有用的AI助手，可以回答用户的各种问题。",
                 IsDefault = true
             };
-            generalTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.User, Content = "你好，能帮我解答一些问题吗？" });
-            generalTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.Assistant, Content = "你好！我很乐意帮你解答问题。请问你有什么需要我帮助的呢？" });
-
+            generalTemplate.PrefixMessages.Add(new ChatMessage
+                { Role = ChatRole.System, Content = "你是一个通用的AI助手，能够回答各种问题。" });
+            
             PromptTemplates.Add(generalTemplate);
 
             var codeTemplate = new PromptTemplate
             {
                 Name = "代码专家",
-                SystemPrompt = "你是一个专业的编程助手，擅长编写和解释代码，并提供详细的代码示例。",
                 Temperature = 0.3,
                 MaxTokens = 3000
             };
-            codeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.User, Content = "我需要你帮我解决一些编程问题。" });
-            codeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.Assistant, Content = "当然，很高兴能帮你解决编程问题。请描述你遇到的问题或者需要什么样的代码帮助。" });
-
+            codeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.System, Content = "你是一个专业的编程助手，擅长编写和解释代码，并提供详细的代码示例。" });
+           
             PromptTemplates.Add(codeTemplate);
 
             var creativeTemplate = new PromptTemplate
             {
                 Name = "创意写作",
-                SystemPrompt = "你是一个创意写作助手，可以帮助用户创作故事、诗歌和其他创意内容。",
                 Temperature = 0.9,
                 MaxTokens = 2500
             };
-            creativeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.User, Content = "我想创作一些有创意的内容。" });
-            creativeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.Assistant, Content = "太棒了！我很乐意帮你进行创意写作。你有什么特定的题材、风格或类型的创作想法吗？" });
-
+            creativeTemplate.PrefixMessages.Add(new ChatMessage { Role = ChatRole.System, Content = "你是一个创意写作助手，可以帮助用户创作故事、诗歌和其他创意内容。" });
+           
             PromptTemplates.Add(creativeTemplate);
 
-            // 设置默认选中的模板
-            SelectedTemplate = PromptTemplates[0];
         }
 
+      
         public void AddNewTemplate()
         {
             if (string.IsNullOrWhiteSpace(NewTemplateName))
@@ -138,7 +188,6 @@ namespace DesktopAIShortcut.ViewModels
             var newTemplate = new PromptTemplate
             {
                 Name = NewTemplateName,
-                SystemPrompt = "你是一个有用的AI助手。"
             };
 
             PromptTemplates.Add(newTemplate);

@@ -5,9 +5,11 @@ namespace DesktopAIShortcut.Models
 {
     public enum ChatRole
     {
-        User,
+        
+        System,
+        
         Assistant,
-        System
+        User,
     }
 
     public class ChatMessage : INotifyPropertyChanged
