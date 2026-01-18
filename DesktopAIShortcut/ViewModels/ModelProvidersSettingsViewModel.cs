@@ -11,11 +11,12 @@ using DesktopAIShortcut.Models;
 using Avalonia.Threading;
 using System.Linq;
 using System.Reflection;
+using CommunityToolkit.Mvvm.Input;
 using DesktopAIShortcut.ViewModels;
 
 namespace DesktopAIShortcut.ViewModels
 {
-    public class ModelProvidersSettingsViewModel : INotifyPropertyChanged
+    public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
     {
         private ObservableCollection<ModelProvider> _providers;
         private ModelProvider _selectedProvider;
@@ -46,13 +47,7 @@ namespace DesktopAIShortcut.ViewModels
             set => SetProperty(ref _isTesting, value);
         }
 
-        
-        
-        public ICommand TestConnection { get; }
-        public ICommand SaveSettings { get; }
-        public ICommand AddCustomModel { get; }
-        public ICommand RemoveSelectedModel { get; }
-        public ICommand ToggleModelSelection { get; }
+         
 
         public ModelProvidersSettingsViewModel()
         {
@@ -65,6 +60,7 @@ namespace DesktopAIShortcut.ViewModels
                 
                 var modelProvider = new ModelProvider
                 {
+                    ProviderName=templateProvider.Value.ProviderName,
                     Name = templateProvider.Value.Name,
                     IsEnabled = selected?.Enabled==true,
                     ApiEndpoint = selected?.Endpoint ?? templateProvider.Value.Endpoint,
@@ -82,6 +78,7 @@ namespace DesktopAIShortcut.ViewModels
             {
                 var modelProvider = new ModelProvider
                 {
+                    ProviderName= provider.ProviderName,
                     Name = provider.Name,
                     IsEnabled = provider.Enabled==true,
                     ApiEndpoint = provider.Endpoint  ,
@@ -124,15 +121,9 @@ namespace DesktopAIShortcut.ViewModels
             // };
 
             SelectedProvider = Providers.FirstOrDefault();
-            
-            // 初始化命令
-            TestConnection = new RelayCommand(async _ => await TestConnectionAsync());
-            SaveSettings = new RelayCommand(_ => SaveSettingsExecute());
-            AddCustomModel = new RelayCommand(_ => AddCustomModelExecute());
-            RemoveSelectedModel = new RelayCommand(param => RemoveSelectedModelExecute(param as string));
-            ToggleModelSelection = new RelayCommand(param => ToggleModelSelectionExecute(param as string));
+             
         }
-
+        [RelayCommand]
         private async Task TestConnectionAsync()
         {
             if (SelectedProvider == null) return;
@@ -142,17 +133,17 @@ namespace DesktopAIShortcut.ViewModels
             await Task.Delay(1000); // 模拟测试过程
             IsTesting = false;
         }
-
-        private void SaveSettingsExecute()
+        [RelayCommand]
+        private void SaveSettings()
         {
             // 保存设置的逻辑
             var providerList=new List<ApplicationConfig.Provider>();
             foreach (var provider in Providers)
             {
-                ApplicationConfig.Provider.ProviderTemplates.TryGetValue(provider.Name, out var template);
+                ApplicationConfig.Provider.ProviderTemplates.TryGetValue(provider.ProviderName, out var template);
                 var selectedProvider = new ApplicationConfig.Provider
                 {
-                    ProviderName = provider.Name,
+                    ProviderName = provider.ProviderName,
                     Endpoint = provider.ApiEndpoint,
                     Key = provider.ApiKey,
                     Model = provider.SelectedModels.ToArray(),
@@ -168,8 +159,8 @@ namespace DesktopAIShortcut.ViewModels
             ApplicationConfig.Instance.Providers = providerList;
             ApplicationConfig.Instance.SaveSettings();
         }
-
-        private void AddCustomModelExecute()
+        [RelayCommand]
+        private void AddCustomModel()
         {
             if (SelectedProvider == null || string.IsNullOrWhiteSpace(SelectedProvider.CustomModelInput)) 
                 return;
@@ -180,22 +171,22 @@ namespace DesktopAIShortcut.ViewModels
             if (!SelectedProvider.AvailableModels.Contains(modelName))
             {
                 SelectedProvider.AvailableModels.Add(modelName);
-             ToggleModelSelection.Execute(modelName);
+                this.ToggleModelSelection(modelName);
             }
             
             // 清空输入框
             SelectedProvider.CustomModelInput = string.Empty;
         }
-
-        private void RemoveSelectedModelExecute(string modelName)
+        [RelayCommand]
+        private void RemoveSelectedModel(string modelName)
         {
             if (SelectedProvider == null || string.IsNullOrEmpty(modelName)) 
                 return;
                 
             SelectedProvider.SelectedModels.Remove(modelName);
         }
-
-        private void ToggleModelSelectionExecute(string modelName)
+        [RelayCommand]
+        private void ToggleModelSelection(string modelName)
         {
             if (SelectedProvider == null || string.IsNullOrEmpty(modelName)) 
                 return;
@@ -231,23 +222,7 @@ namespace DesktopAIShortcut.ViewModels
         }
     }
 
-    // 简单的Command实现
-    public class RelayCommand : ICommand
-    {
-        private readonly System.Action<object> _execute;
-        private readonly System.Func<object, bool> _canExecute;
-
-        public RelayCommand(System.Action<object> execute, System.Func<object, bool> canExecute = null)
-        {
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-        public void Execute(object parameter) => _execute(parameter);
-        public event System.EventHandler CanExecuteChanged;
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, System.EventArgs.Empty);
-    }
+ 
 }
 
 // 添加一个用于模型选择状态转换的转换器

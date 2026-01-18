@@ -21,7 +21,7 @@ public partial class ChatMsgControl : UserControl
             if (foregroundBrush is Color color)
             {
                 var htmlcolor=$"#{color.R:X2}{color.G:X2}{color.B:X2}";
-                _htmllabel.BaseStylesheet="#mainmd{color: "+htmlcolor+"}";
+                // _htmllabel.BaseStylesheet="#mainmd{color: "+htmlcolor+"}";
                
             }
         }; 
@@ -38,13 +38,13 @@ public partial class ChatMsgControl : UserControl
         {
             var ass=AssetLoader.Open(new Uri("avares://DesktopAIShortcut/Assets/github-markdown-dark.css"));
             var reader = new StreamReader(ass,Encoding.UTF8);
-            _htmllabel.BaseStylesheet += reader.ReadToEnd();
+            // _htmllabel.BaseStylesheet += reader.ReadToEnd();
         }
         else
         {
             var ass = AssetLoader.Open(new Uri("avares://DesktopAIShortcut/Assets/github-markdown-light.css"));
             var reader = new StreamReader(ass, Encoding.UTF8);
-            _htmllabel.BaseStylesheet += reader.ReadToEnd();
+            // _htmllabel.BaseStylesheet += reader.ReadToEnd();
         }
         if (Design.IsDesignMode)
         {

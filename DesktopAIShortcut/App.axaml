@@ -3,8 +3,16 @@
              xmlns:global="clr-namespace:"
              x:Class="DesktopAIShortcut.App"
              RequestedThemeVariant="Default">
+    
+    <Application.Styles>
+        <!-- Your other styles here -->
+        <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml"/>
+    </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://LiveMarkdown.Avalonia/Defaults.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <global:ModelSelectionMultiConverter x:Key="ModelSelectionMultiConverter"/>
             <global:EnumDescriptionConverter x:Key="enumConverter" />
         </ResourceDictionary>

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+using LiveMarkdown.Avalonia;
 using Markdig;
 using OpenAI.Chat;
 
@@ -38,19 +41,27 @@ public class ChatMsgModel:INotifyPropertyChanged
         }
     }
 
-    public string Html
+    // public string Html
+    // {
+    //     get
+    //     {
+    //         if (string.IsNullOrEmpty(_markdown))
+    //         {
+    //             return "";
+    //             
+    //         }
+    //         return "<div id=\"mainmd\" class=\"markdown-body\">" + Markdig.Markdown.ToHtml(Markdown,pipeline)+ "</div>";
+    //     }
+    // }
+
+    private ObservableStringBuilder _markdownStringBuilder=new ObservableStringBuilder();
+
+    [JsonIgnore]
+    public ObservableStringBuilder MarkdownStringBuilder
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_markdown))
-            {
-                return "";
-                
-            }
-            return "<div id=\"mainmd\" class=\"markdown-body\">" + Markdig.Markdown.ToHtml(Markdown,pipeline)+ "</div>";
-        }
+        get => _markdownStringBuilder;
     }
-    
+
     public string Markdown
     {
         get => _markdown;
@@ -59,7 +70,9 @@ public class ChatMsgModel:INotifyPropertyChanged
             if (value == _markdown) return;
             _markdown = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(Html));
+            this._markdownStringBuilder.Clear().AppendLine(value);
+            
+            // OnPropertyChanged(nameof(Html));
         }
     }
 

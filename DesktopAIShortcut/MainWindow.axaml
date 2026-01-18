@@ -80,6 +80,13 @@
 				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"  VerticalContentAlignment="Stretch"/>
 				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"/>
 			</DockPanel>
+			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+				<Label>模型</Label>
+				<ComboBox></ComboBox>
+				<Label>提示词预设</Label>
+				<ComboBox></ComboBox>
+				<CheckBox Content="问答模式"></CheckBox>
+			</StackPanel>
 			<ScrollViewer x:Name="ScrollViewer">
 				<StackPanel>
 					<desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/>

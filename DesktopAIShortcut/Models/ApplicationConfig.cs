@@ -48,7 +48,18 @@ public class ApplicationConfig
                     DefaultModel = "gemini-pro"
                 }
             },
-
+            {
+                "OpenRouter", new Provider()
+                {
+                    ProviderName = "OpenRouter",
+                    Type = AIEndpointType.OpenAI,
+                    Name = "OpenRouter",
+                    Endpoint = "https://openrouter.ai/api/v1",
+                    Key = "",
+                    Model = new string[] { "gemini-pro", "gemini-pro-vision", "gemini-1.5-pro", "gemini-1.5-flash" },
+                    DefaultModel = "gemini-pro"
+                }
+            },
             {
                 "Azure", new Provider()
                 {
@@ -156,6 +167,7 @@ public class ApplicationConfig
         public string[] Model { get; set; } = [];
         public string DefaultModel { get; set; } = "";
         public bool Enabled { get; set; }
+        
 
         public Provider Clone()
         {
