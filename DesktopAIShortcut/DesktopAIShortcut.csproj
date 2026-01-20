@@ -47,6 +47,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="LiveMarkdown.Avalonia" Version="1.7.0" />
         <PackageReference Include="Markdig" Version="0.44.0" />
+        <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.2.0" />
         <PackageReference Include="OpenAI" Version="2.8.0" />
     </ItemGroup>
 </Project>
