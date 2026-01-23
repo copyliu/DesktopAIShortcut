@@ -6,6 +6,7 @@
         xmlns:avalonia="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
         xmlns:desktopAiShortcut="clr-namespace:DesktopAIShortcut"
         xmlns:models="clr-namespace:DesktopAIShortcut.Models"
+        xmlns:viewModels="clr-namespace:DesktopAIShortcut.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Closing="Window_OnClosing"
         Icon="/Assets/icon.ico"
         ExtendClientAreaToDecorationsHint="True"
@@ -33,7 +34,7 @@
 				<ScrollViewer>
 					<ItemsControl x:Name="HistoryList">
 						<ItemsControl.ItemTemplate>
-							<DataTemplate x:DataType="models:ChatHistoryModel">
+							<DataTemplate x:DataType="viewModels:ChatHistoryViewModel">
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="*"/>
@@ -92,8 +93,8 @@
 					<desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/>
 					<ItemsControl x:Name="ItemsControl">
 						<ItemsControl.ItemTemplate>
-							<DataTemplate x:DataType="models:ChatMsgModel">
-								<desktopAiShortcut:ChatMsgControl Margin="10" DataContext="{Binding .}" x:DataType="models:ChatMsgModel"/>
+							<DataTemplate x:DataType="viewModels:ChatMsgViewModel">
+								<desktopAiShortcut:ChatMsgControl Margin="10" DataContext="{Binding .}" x:DataType="viewModels:ChatMsgViewModel"/>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>

@@ -6,16 +6,19 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using DesktopAIShortcut.Commands;
 using DesktopAIShortcut.Models;
+using Microsoft.Extensions.AI;
+using ChatMessage = DesktopAIShortcut.Models.ChatMessage;
 
 namespace DesktopAIShortcut.ViewModels
 {
     public class PromptTemplatesViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<DesktopAIShortcut.Models.ChatRole> ChatRoles { get; }=
+        public ObservableCollection< ChatRole> ChatRoles { get; }=
         [
             ChatRole.System,
            ChatRole.Assistant,
-           ChatRole.User
+           ChatRole.User,
+            ChatRole.Tool
         ];
         private PromptTemplate _selectedTemplate;
         private string _newTemplateName;
@@ -37,7 +40,7 @@ namespace DesktopAIShortcut.ViewModels
                        .Select(p=>new ChatMessage()
                        {
                            Content = p.Content,
-                           Role = (ChatRole)p.RoleIndex
+                           Role = new ChatRole(p.Role)
                            
                        })),
                     Temperature = instanceChatPreset.Temperature,
@@ -49,7 +52,7 @@ namespace DesktopAIShortcut.ViewModels
                      .Select(p=>new ChatMessage()
                      {
                          Content = p.Content,
-                         Role = (ChatRole)p.RoleIndex
+                         Role = new ChatRole(p.Role)
                            
                      })),
                 };

@@ -50,4 +50,10 @@
         <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.2.0" />
         <PackageReference Include="OpenAI" Version="2.8.0" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="SettingWindowOld.axaml.cs" />
+      <None Include="SettingWindowOld.axaml.cs" />
+      <AvaloniaXaml Remove="SettingWindowOld.axaml" />
+      <None Include="SettingWindowOld.axaml" />
+    </ItemGroup>
 </Project>

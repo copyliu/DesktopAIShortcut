@@ -5,10 +5,11 @@
              xmlns:avalonia="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
              xmlns:models="clr-namespace:DesktopAIShortcut.Models"
              xmlns:avalonia1="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
+             xmlns:viewModels="clr-namespace:DesktopAIShortcut.ViewModels"
              RenderOptions.TextRenderingMode="Antialias"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DesktopAIShortcut.ChatMsgControl"
-             x:DataType="models:ChatMsgModel">
+             x:DataType="viewModels:ChatMsgViewModel">
     <DockPanel>
         <Label DockPanel.Dock="Top" Content="{Binding UserName}" ></Label>
         <Border DockPanel.Dock="Bottom" x:Name="Border"  CornerRadius="10">

@@ -1,16 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.AI;
 
 namespace DesktopAIShortcut.Models
-{
-    public enum ChatRole
-    {
-        
-        System,
-        
-        Assistant,
-        User,
-    }
+{ 
 
     public class ChatMessage : INotifyPropertyChanged
     {

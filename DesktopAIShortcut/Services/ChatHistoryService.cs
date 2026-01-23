@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Linq;
 using DesktopAIShortcut.Models;
+using DesktopAIShortcut.ViewModels;
 
 namespace DesktopAIShortcut.Services
 {
@@ -13,34 +15,32 @@ namespace DesktopAIShortcut.Services
     /// </summary>
     public class ChatHistoryService
     {
-        // 存储聊天历史记录的文件夹路径
-        private readonly string _historyFolder;
-        // 应用程序数据文件夹路径
-        private readonly string _appDataFolder;
+        private readonly string savefolder;
 
         /// <summary>
         /// 构造函数：初始化服务，创建必要的文件夹
         /// </summary>
         public ChatHistoryService()
         {
-            // 获取Windows系统中的AppData文件夹路径，并在其中创建我们的应用文件夹
-            _appDataFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "DesktopAIShortcut"
-            );
-
-            // 确保应用数据文件夹存在
-            if (!Directory.Exists(_appDataFolder))
+            
+            var savefolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrEmpty(savefolder))
             {
-                Directory.CreateDirectory(_appDataFolder);
+                savefolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             }
 
-            // 在应用数据文件夹中创建存储聊天历史的子文件夹
-            _historyFolder = Path.Combine(_appDataFolder, "ChatHistory");
-            if (!Directory.Exists(_historyFolder))
+            if (string.IsNullOrEmpty(savefolder))
             {
-                Directory.CreateDirectory(_historyFolder);
+                savefolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             }
+
+            // 设置配置文件夹路径并创建文件夹（如果不存在的话）
+            savefolder = Path.Combine(savefolder, "DesktopAIShortcut", "ChatHistory");
+            if (!Directory.Exists(savefolder))
+            {
+                Directory.CreateDirectory(savefolder);
+            }
+
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace DesktopAIShortcut.Services
         /// </summary>
         /// <param name="chat">需要处理的聊天历史记录</param>
         /// <returns>处理后的聊天历史记录</returns>
-        private ChatHistoryModel ValidateAndCleanMessages(ChatHistoryModel chat)
+        private ChatHistoryViewModel ValidateAndCleanMessages(ChatHistoryViewModel chat)
         {
             // 如果聊天记录为空，直接返回
             if (chat?.Messages == null || !chat.Messages.Any())
@@ -57,7 +57,7 @@ namespace DesktopAIShortcut.Services
             }
 
             // 用于存储清理后的消息列表
-            var cleanedMessages = new List<ChatMsgModel>();
+            var cleanedMessages = new List<ChatMsgViewModel>();
 
             // 过滤掉空消息，并获取所有有效消息
             var validMessages = chat.Messages
@@ -71,10 +71,10 @@ namespace DesktopAIShortcut.Services
             }
 
             // 初始化第一条消息
-            var currentMessage = new ChatMsgModel
+            var currentMessage = new ChatMsgViewModel
             {
-                IsUser = validMessages[0].IsUser,
-                UserName = validMessages[0].UserName,
+               Role = validMessages[0].Role,
+                UserName = "",
                 Markdown = validMessages[0].Markdown
             };
 
@@ -84,26 +84,22 @@ namespace DesktopAIShortcut.Services
                 var message = validMessages[i];
 
                 // 如果当前消息与上一条消息来自同一角色
-                if (currentMessage.IsUser == message.IsUser)
+                if (currentMessage.Role == message.Role)
                 {
                     // 合并消息内容，确保只添加一次
                     currentMessage.Markdown = currentMessage.Markdown + "\n\n" + message.Markdown;
 
-                    // 如果当前消息没有用户名，使用新消息的用户名
-                    if (string.IsNullOrEmpty(currentMessage.UserName))
-                    {
-                        currentMessage.UserName = message.UserName;
-                    }
+                   
                 }
                 else
                 {
                     // 如果角色不同，保存当前消息并开始新的消息
                     cleanedMessages.Add(currentMessage);
-                    currentMessage = new ChatMsgModel
+                    currentMessage = new ChatMsgViewModel
                     {
-                        IsUser = message.IsUser,
-                        UserName = message.UserName,
-                        Markdown = message.Markdown
+                     
+                       Role = message.Role,
+                       Markdown =  message.Markdown,
                     };
                 }
             }
@@ -112,7 +108,7 @@ namespace DesktopAIShortcut.Services
             cleanedMessages.Add(currentMessage);
 
             // 更新聊天记录中的消息列表
-            chat.Messages = cleanedMessages;
+            chat.Messages=new ObservableCollection<ChatMsgViewModel>(cleanedMessages);
             return chat;
         }
 
@@ -120,7 +116,7 @@ namespace DesktopAIShortcut.Services
         /// 保存聊天记录到文件
         /// </summary>
         /// <param name="chat">要保存的聊天记录</param>
-        public void SaveChat(ChatHistoryModel chat)
+        public void SaveChat(ChatHistoryViewModel chat)
         {
             try
             {
@@ -140,7 +136,7 @@ namespace DesktopAIShortcut.Services
                 chat = ValidateAndCleanMessages(chat);
 
                 // 生成保存文件的完整路径
-                var filePath = Path.Combine(_historyFolder, $"{chat.Id}.json");
+                var filePath = Path.Combine(savefolder, $"{chat.Id}.json");
 
                 // 将聊天记录转换为JSON格式（使用缩进使文件更易读）
                 var json = JsonSerializer.Serialize(chat, new JsonSerializerOptions
@@ -162,27 +158,27 @@ namespace DesktopAIShortcut.Services
         /// 加载所有聊天记录
         /// </summary>
         /// <returns>按最后更新时间排序的聊天记录列表</returns>
-        public List<ChatHistoryModel> LoadAllChats()
+        public List<ChatHistoryViewModel> LoadAllChats()
         {
-            var chats = new List<ChatHistoryModel>();
+            var chats = new List<ChatHistoryViewModel>();
 
             try
             {
                 // 如果历史记录文件夹不存在，返回空列表
-                if (!Directory.Exists(_historyFolder))
+                if (!Directory.Exists(savefolder))
                 {
                     return chats;
                 }
 
                 // 获取文件夹中所有的JSON文件
-                foreach (var file in Directory.GetFiles(_historyFolder, "*.json"))
+                foreach (var file in Directory.GetFiles(savefolder, "*.json"))
                 {
                     try
                     {
                         // 读取JSON文件内容
                         var json = File.ReadAllText(file);
                         // 将JSON转换为聊天记录对象
-                        var chat = JsonSerializer.Deserialize<ChatHistoryModel>(json);
+                        var chat = JsonSerializer.Deserialize<ChatHistoryViewModel>(json);
                         if (chat != null)
                         {
                             // 验证和清理消息后添加到列表
@@ -213,22 +209,22 @@ namespace DesktopAIShortcut.Services
         /// </summary>
         /// <param name="id">聊天记录的唯一标识符</param>
         /// <returns>加载的聊天记录，如果找不到则返回新的空聊天记录</returns>
-        public ChatHistoryModel LoadChat(string id)
+        public ChatHistoryViewModel LoadChat(string id)
         {
             try
             {
                 // 构建完整的文件路径
-                var filePath = Path.Combine(_historyFolder, $"{id}.json");
+                var filePath = Path.Combine(savefolder, $"{id}.json");
 
                 // 如果文件不存在，返回新的空聊天记录
                 if (!File.Exists(filePath))
                 {
-                    return new ChatHistoryModel();
+                    return new ChatHistoryViewModel();
                 }
 
                 // 读取并解析JSON文件
                 var json = File.ReadAllText(filePath);
-                var chat = JsonSerializer.Deserialize<ChatHistoryModel>(json) ?? new ChatHistoryModel();
+                var chat = JsonSerializer.Deserialize<ChatHistoryViewModel>(json) ?? new ChatHistoryViewModel();
 
                 // 验证和清理消息后返回
                 return ValidateAndCleanMessages(chat);
@@ -237,7 +233,7 @@ namespace DesktopAIShortcut.Services
             {
                 // 如果加载过程中出现错误，记录错误并返回新的空聊天记录
                 Console.WriteLine($"加载聊天记录失败 {id}: {ex.Message}");
-                return new ChatHistoryModel();
+                return new ChatHistoryViewModel();
             }
         }
 
@@ -250,7 +246,7 @@ namespace DesktopAIShortcut.Services
             try
             {
                 // 构建完整的文件路径
-                var filePath = Path.Combine(_historyFolder, $"{id}.json");
+                var filePath = Path.Combine(savefolder, $"{id}.json");
 
                 // 如果文件存在则删除
                 if (File.Exists(filePath))

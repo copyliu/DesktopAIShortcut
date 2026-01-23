@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using LiveMarkdown.Avalonia;
 using Microsoft.Extensions.AI;
 
@@ -57,6 +58,11 @@ public class ChatMsgViewModel:INotifyPropertyChanged
         this._markdownStringBuilder.Append(text);
     }
     
+    [JsonIgnore]
+    public ObservableStringBuilder MarkdownStringBuilder
+    {
+        get => _markdownStringBuilder;
+    }
     
     
     public event PropertyChangedEventHandler? PropertyChanged;

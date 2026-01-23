@@ -9,6 +9,7 @@ using OpenAI.Chat;
 
 namespace DesktopAIShortcut.Models;
 
+[Obsolete("弃用",true)]
 public class ChatMsgModel:INotifyPropertyChanged
 {
     

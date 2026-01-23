@@ -7,6 +7,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform;
 using DesktopAIShortcut.Models;
+using DesktopAIShortcut.ViewModels;
+using Microsoft.Extensions.AI;
 
 namespace DesktopAIShortcut;
 
@@ -48,11 +50,11 @@ public partial class ChatMsgControl : UserControl
         }
         if (Design.IsDesignMode)
         {
-            this.DataContext = new ChatMsgModel()
+            this.DataContext = new ChatMsgViewModel()
             {
                 UserName = "AI",
                 Markdown = "Hello, I am AI",
-                IsUser = false
+                Role = ChatRole.Assistant
             };
         }
        

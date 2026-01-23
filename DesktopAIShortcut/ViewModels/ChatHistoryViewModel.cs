@@ -18,7 +18,7 @@ public class ChatHistoryViewModel : INotifyPropertyChanged
     private string _title1 = "";
     private DateTime _createTime1 = DateTime.Now;
     private DateTime _lastUpdateTime = DateTime.Now;
-    private ObservableCollection<ChatHistoryViewModel> _messages = new();
+    private ObservableCollection<ChatMsgViewModel> _messages = new();
     private string _providerName;
     private string _modelName;
     private string _promptName;
@@ -48,7 +48,7 @@ public class ChatHistoryViewModel : INotifyPropertyChanged
         set => SetField(ref _lastUpdateTime, value);
     }
 
-    public ObservableCollection<ChatHistoryViewModel> Messages
+    public ObservableCollection<ChatMsgViewModel> Messages
     {
         get => _messages;
         set => SetField(ref _messages, value);

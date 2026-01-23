@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace DesktopAIShortcut.Models
 {
+    [Obsolete("弃用",true)]
     public class ChatHistoryModel:INotifyPropertyChanged
     {
         private string _title = "";
