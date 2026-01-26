@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Text.Json.Serialization;
-using OpenAI.Chat;
+using System.Text.Json.Serialization; 
 
 namespace DesktopAIShortcut.Models
 {
@@ -87,14 +86,15 @@ namespace DesktopAIShortcut.Models
             }
         }
 
-        [JsonIgnore]
-        public OpenAI.Chat.ChatMessage ChatMessage => Role.ToLower() switch
-        {
-            "system" => new SystemChatMessage(Content),
-            "assistant" => new AssistantChatMessage(Content),
-            "user" => new UserChatMessage(Content),
-            _ => throw new ArgumentException("Invalid role")
-        };
+        // [JsonIgnore]
+        // public OpenAI.Chat.ChatMessage ChatMessage => Role.ToLower() switch
+        // {
+        //     "system" => new SystemChatMessage(Content),
+        //     "assistant" => new AssistantChatMessage(Content),
+        //     "user" => new UserChatMessage(Content),
+        //     "tool" => new UserChatMessage(Content),
+        //     _ => throw new ArgumentException("Invalid role")
+        // };
 
         public event PropertyChangedEventHandler PropertyChanged;
 

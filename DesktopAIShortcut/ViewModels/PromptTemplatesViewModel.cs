@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using DesktopAIShortcut.Commands;
 using DesktopAIShortcut.Models;
 using Microsoft.Extensions.AI;
@@ -11,7 +13,7 @@ using ChatMessage = DesktopAIShortcut.Models.ChatMessage;
 
 namespace DesktopAIShortcut.ViewModels
 {
-    public class PromptTemplatesViewModel : INotifyPropertyChanged
+    public partial class PromptTemplatesViewModel : INotifyPropertyChanged
     {
         public ObservableCollection< ChatRole> ChatRoles { get; }=
         [
@@ -61,13 +63,7 @@ namespace DesktopAIShortcut.ViewModels
             
             
             
-            
-
-            // 命令初始化
-            AddPrefixMessageCommand = new RelayCommand(_ => AddPrefixMessage());
-            RemovePrefixMessageCommand = new RelayCommand(_ => RemovePrefixMessage());
-            AddSuffixMessageCommand = new RelayCommand(_ => AddSuffixMessage());
-            RemoveSuffixMessageCommand = new RelayCommand(_ => RemoveSuffixMessage());
+             
 
 
 
@@ -139,14 +135,8 @@ namespace DesktopAIShortcut.ViewModels
             }
         }
 
-        public ICommand AddPrefixMessageCommand { get; }
-        public ICommand RemovePrefixMessageCommand { get; }
-        public ICommand AddSuffixMessageCommand { get; }
-        public ICommand RemoveSuffixMessageCommand { get; }
-
-        public ICommand SaveTemplatesCommand => new RelayCommand(_ => SaveTemplates());
-        public ICommand AddDefaultCommand => new RelayCommand(_ => AddDefault());
-
+      
+        [RelayCommand]
         private void AddDefault()
         {
             // 添加一些默认模板
@@ -182,7 +172,7 @@ namespace DesktopAIShortcut.ViewModels
 
         }
 
-      
+        [RelayCommand]
         public void AddNewTemplate()
         {
             if (string.IsNullOrWhiteSpace(NewTemplateName))
@@ -197,7 +187,7 @@ namespace DesktopAIShortcut.ViewModels
             SelectedTemplate = newTemplate;
             NewTemplateName = string.Empty;
         }
-
+        [RelayCommand]
         public void DeleteSelectedTemplate()
         {
             if (SelectedTemplate == null || SelectedTemplate.IsDefault)
@@ -206,7 +196,7 @@ namespace DesktopAIShortcut.ViewModels
             PromptTemplates.Remove(SelectedTemplate);
             SelectedTemplate = PromptTemplates.Count > 0 ? PromptTemplates[0] : null;
         }
-
+        [RelayCommand]
         public void AddPrefixMessage()
         {
             if (SelectedTemplate == null) return;
@@ -215,7 +205,7 @@ namespace DesktopAIShortcut.ViewModels
             SelectedTemplate.PrefixMessages.Add(newMessage);
             SelectedPrefixMessage = newMessage;
         }
-
+        [RelayCommand]
         public void RemovePrefixMessage()
         {
             if (SelectedTemplate == null || SelectedPrefixMessage == null) return;
@@ -223,7 +213,7 @@ namespace DesktopAIShortcut.ViewModels
             SelectedTemplate.PrefixMessages.Remove(SelectedPrefixMessage);
             SelectedPrefixMessage = null;
         }
-
+        [RelayCommand]
         public void AddSuffixMessage()
         {
             if (SelectedTemplate == null) return;
@@ -232,7 +222,7 @@ namespace DesktopAIShortcut.ViewModels
             SelectedTemplate.SuffixMessages.Add(newMessage);
             SelectedSuffixMessage = newMessage;
         }
-
+        [RelayCommand]
         public void RemoveSuffixMessage()
         {
             if (SelectedTemplate == null || SelectedSuffixMessage == null) return;
@@ -240,10 +230,49 @@ namespace DesktopAIShortcut.ViewModels
             SelectedTemplate.SuffixMessages.Remove(SelectedSuffixMessage);
             SelectedSuffixMessage = null;
         }
-
+        [RelayCommand]
         public void SaveTemplates()
         {
             // TODO: 实现模板保存到配置文件的逻辑
+            var promptlist=new List<ApplicationConfig.ChatPreset>();
+            foreach (var template in PromptTemplates)
+            {
+                var chatPreset = new ApplicationConfig.ChatPreset
+                {
+                    Name = template.Name,
+                    Temperature = template.Temperature,
+                    MaxTokens = template.MaxTokens,
+                    IsDefault = template.IsDefault,
+                    ContextMessages =  new List<ContextMessage>()
+                };
+
+                int order = 0;
+                foreach (var msg in template.PrefixMessages)
+                {
+                    chatPreset.ContextMessages.Add(new  ContextMessage
+                    {
+                        Role = msg.Role.ToString(),
+                        Content = msg.Content,
+                        IsBeforeChat = false,
+                        Order = order++
+                    });
+                }
+                foreach (var msg in template.SuffixMessages)
+                {
+                    chatPreset.ContextMessages.Add(new ContextMessage
+                    {
+                        Role = msg.Role.ToString(),
+                        Content = msg.Content,
+                        IsBeforeChat = true,
+                        Order = order++
+                    });
+                }
+
+                promptlist.Add(chatPreset);
+            }
+            ApplicationConfig.Instance.ChatPresets = promptlist;
+            ApplicationConfig.Instance.SaveSettings();
+            
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

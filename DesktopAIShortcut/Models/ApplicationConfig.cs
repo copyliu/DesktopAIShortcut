@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Text.Json.Serialization;
+using DesktopAIShortcut.ViewModels;
 
 namespace DesktopAIShortcut.Models;
 
@@ -188,7 +191,7 @@ public class ApplicationConfig
     {
         public string Name { get; set; } = "默认";
         public List<ContextMessage> ContextMessages { get; set; } = new List<ContextMessage>();
-        public float Temperature { get; set; } = 0.7f; // 默认温度0.7
+        public double Temperature { get; set; } = 0.7f; // 默认温度0.7
         public int MaxTokens { get; set; } = 2000; // 默认最大生成长度2000
         public float TopP { get; set; } = 1.0f; // 默认top-p为1.0
         public int TopK { get; set; } = 40; // 默认top-k为40
@@ -236,6 +239,8 @@ public class ApplicationConfig
     public List<Provider> Providers { get; set; } = new List<Provider>();
     public List<ChatPreset> ChatPresets { get; set; } = new List<ChatPreset>();
     public List<RemoteMCPServer> RemoteMCPServers { get; set; } = new List<RemoteMCPServer>();
+    [JsonIgnore]
+    public List<ModelSelectionViewModel> ModelList=>Providers.Select(p=>p.Model.Select(m=>new ModelSelectionViewModel(p,m))).SelectMany(t=>t).ToList();
 
     public void SaveSettings()
     {

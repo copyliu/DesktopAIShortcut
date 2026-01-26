@@ -104,10 +104,18 @@ namespace DesktopAIShortcut
             }
         }
 
+        public event EventHandler? SettingWindowClosed;
+
         private void Setting_clicked(object? sender, EventArgs e)
         {
             var settingWindow = new SettingWindow();
             settingWindow.Show();
+            settingWindow.Closed += (s, args) =>
+            {
+                SettingWindowClosed?.Invoke(this, EventArgs.Empty);
+                ApplicationConfig.LoadSettings();
+                
+            };
         }
     }
 }

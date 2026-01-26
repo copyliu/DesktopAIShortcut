@@ -29,11 +29,13 @@ public partial class MainWindow : Window
     private ChatHistoryService _historyService = new ChatHistoryService();
     private ChatHistoryViewModel _currentChat = new ChatHistoryViewModel();
     private bool _isAutoSaving = false; // 添加标志位避免循环保存
-
+    private PromptTemplatesViewModel _promptTemplatesViewModel = new PromptTemplatesViewModel();
     public MainWindow()
     {
         InitializeComponent();
-
+        if (Design.IsDesignMode) return;
+        ModelList.ItemsSource = ApplicationConfig.Instance.ModelList;
+        PromptPreset.ItemsSource = _promptTemplatesViewModel.PromptTemplates;
         ItemsControl.ItemsSource = _models;
 
         RefreshHistoryList();

@@ -78,16 +78,59 @@
 		<Label Grid.Row="0" Grid.Column="2"  Content="桌面AI小助手" IsHitTestVisible="False" VerticalAlignment="Center"/>
 		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True">
 			<DockPanel DockPanel.Dock="Bottom"  >
-				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"  VerticalContentAlignment="Stretch"/>
-				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"/>
+				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"  VerticalContentAlignment="Stretch"  />
+				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"   />
 			</DockPanel>
-			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-				<Label>模型</Label>
-				<ComboBox></ComboBox>
-				<Label>提示词预设</Label>
-				<ComboBox></ComboBox>
-				<CheckBox Content="问答模式"></CheckBox>
-			</StackPanel>
+			
+			
+		 
+<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="6" VerticalAlignment="Center" Margin="6">
+  <!-- 模型卡片 -->
+  <Border Grid.Column="0" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1">
+    <StackPanel>
+      <TextBlock Text="模型" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+      <ComboBox x:Name="ModelList" MinWidth="200" MaxWidth="360" Padding="4" HorizontalAlignment="Stretch">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:ModelSelectionViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding SelectedProvider.Name}" Opacity="0.7" FontSize="12"/>
+              <TextBlock Text="·" Opacity="0.4" Margin="2,0"/>
+              <TextBlock Text="{Binding SelectedModel}" FontWeight="SemiBold" FontSize="12"/>
+            </StackPanel>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+        <ComboBox.SelectionBoxItemTemplate>
+          <DataTemplate x:DataType="viewModels:ModelSelectionViewModel">
+            <TextBlock Text="{Binding SelectedModel}" FontSize="12"/>
+          </DataTemplate>
+        </ComboBox.SelectionBoxItemTemplate>
+      </ComboBox>
+    </StackPanel>
+  </Border>
+
+  <!-- 提示词预设卡片 -->
+  <Border Grid.Column="1" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1">
+    <StackPanel>
+      <TextBlock Text="提示词预设" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+      <ComboBox x:Name="PromptPreset" MinWidth="200" MaxWidth="360" Padding="4">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="models:PromptTemplate">
+            <TextBlock Text="{Binding Name}" FontSize="12"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+  </Border>
+
+  <!-- 问答模式开关 -->
+  <Border Grid.Column="2" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1" VerticalAlignment="Stretch">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+      <TextBlock Text="问答模式" VerticalAlignment="Center" FontSize="12"/>
+      <ToggleSwitch Width="52"  VerticalAlignment="Center" Margin="4,0,0,0"/>
+    </StackPanel>
+  </Border>
+</Grid>
+
 			<ScrollViewer x:Name="ScrollViewer">
 				<StackPanel>
 					<desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/>
