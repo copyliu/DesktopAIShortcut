@@ -2,12 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
+using DesktopAIShortcut.Adapter;
 using DesktopAIShortcut.Models;
+using Microsoft.Extensions.AI;
+using OpenAI.Chat;
+using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace DesktopAIShortcut.ViewModels;
 
-public class ChatHistoryViewModel : INotifyPropertyChanged
+public partial class ChatHistoryViewModel : INotifyPropertyChanged
 {
     
     
@@ -19,10 +26,17 @@ public class ChatHistoryViewModel : INotifyPropertyChanged
     private DateTime _createTime1 = DateTime.Now;
     private DateTime _lastUpdateTime = DateTime.Now;
     private ObservableCollection<ChatMsgViewModel> _messages = new();
-    private string _providerName;
+    private string _providerId;
     private string _modelName;
     private string _promptName;
     private bool _singleAnswerMode;
+    private string _userInput;
+
+    public string UserInput
+    {
+        get => _userInput;
+        set => SetField(ref _userInput, value);
+    }
 
     public string Id
     {
@@ -54,10 +68,10 @@ public class ChatHistoryViewModel : INotifyPropertyChanged
         set => SetField(ref _messages, value);
     }
 
-    public string ProviderName
+    public string ProviderId
     {
-        get => _providerName;
-        set => SetField(ref _providerName, value);
+        get => _providerId;
+        set => SetField(ref _providerId, value);
     }
 
     public string ModelName
@@ -77,11 +91,37 @@ public class ChatHistoryViewModel : INotifyPropertyChanged
         get => _singleAnswerMode;
         set => SetField(ref _singleAnswerMode, value);
     }
+
+
+
+    //TODO: client????
+    private ChatClient? client;
     
-    
-    
-    
-    
+[RelayCommand]
+    public async Task AddUserMessageAsync()
+    {
+        _messages.Add(new ChatMsgViewModel()
+        {
+            Role = ChatRole.User,
+            Markdown = UserInput,
+            UserName = "用户"
+        });
+
+        var response = new ChatMsgViewModel()
+        {
+            Role = ChatRole.Assistant,
+            Markdown = "",
+            UserName = "AI助手"
+        };
+        this.Messages.Add(response);
+        var provider=ApplicationConfig.Instance.Providers.First(p=>p.ProviderId==ProviderId);
+        var adap = new OpenAIAdapter(provider, ModelName);
+        var resp = await adap.SendMessageAsync(this._messages.ToList());
+        response.Markdown = resp.Markdown;
+        
+        
+        return;
+    }
     
     
     public event PropertyChangedEventHandler? PropertyChanged;

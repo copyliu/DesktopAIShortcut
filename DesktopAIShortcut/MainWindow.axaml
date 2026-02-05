@@ -76,10 +76,10 @@
 
 		<!-- 右侧聊天区域 -->
 		<Label Grid.Row="0" Grid.Column="2"  Content="桌面AI小助手" IsHitTestVisible="False" VerticalAlignment="Center"/>
-		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True">
+		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True"  x:Name="CurrentChatPanel" x:DataType="viewModels:ChatHistoryViewModel">
 			<DockPanel DockPanel.Dock="Bottom"  >
-				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Click="SendBtn_OnClick"  VerticalContentAlignment="Stretch"  />
-				<TextBox Text="" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"   />
+				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Command="{Binding AddUserMessageAsync}"  VerticalContentAlignment="Stretch"  />
+				<TextBox Text="{Binding UserInput}" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"   />
 			</DockPanel>
 			
 			
@@ -89,7 +89,7 @@
   <Border Grid.Column="0" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1">
     <StackPanel>
       <TextBlock Text="模型" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-      <ComboBox x:Name="ModelList" MinWidth="200" MaxWidth="360" Padding="4" HorizontalAlignment="Stretch">
+      <ComboBox x:Name="ModelList" MinWidth="200" MaxWidth="360" Padding="4" HorizontalAlignment="Stretch" SelectionChanged="ModelList_OnSelectionChanged" >
         <ComboBox.ItemTemplate>
           <DataTemplate x:DataType="viewModels:ModelSelectionViewModel">
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -133,8 +133,8 @@
 
 			<ScrollViewer x:Name="ScrollViewer">
 				<StackPanel>
-					<desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/>
-					<ItemsControl x:Name="ItemsControl">
+					<!-- <desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/> -->
+					<ItemsControl x:Name="ItemsControl" ItemsSource="{Binding  Path=Messages}">
 						<ItemsControl.ItemTemplate>
 							<DataTemplate x:DataType="viewModels:ChatMsgViewModel">
 								<desktopAiShortcut:ChatMsgControl Margin="10" DataContext="{Binding .}" x:DataType="viewModels:ChatMsgViewModel"/>

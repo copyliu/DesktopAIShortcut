@@ -50,12 +50,14 @@ public class ChatMsgViewModel:INotifyPropertyChanged
     {
         this._markdown += line + "\n";
         this._markdownStringBuilder.AppendLine(line);
+        OnPropertyChanged(nameof(Markdown));
     }
 
     public void AppendText(string text)
     {
         this._markdown += text;
         this._markdownStringBuilder.Append(text);
+        OnPropertyChanged(nameof(Markdown));
     }
     
     [JsonIgnore]

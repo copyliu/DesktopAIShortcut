@@ -29,7 +29,7 @@ public class ApplicationConfig
             {
                 "OpenAI", new Provider()
                 {
-                    ProviderName = "OpenAI",
+                    ProviderId = "OpenAI",
                     Type = AIEndpointType.OpenAI,
                     Name = "OpenAI",
                     Endpoint = "https://api.openai.com/v1",
@@ -42,7 +42,7 @@ public class ApplicationConfig
             {
                 "Gemini", new Provider()
                 {
-                    ProviderName = "Gemini",
+                    ProviderId = "Gemini",
                     Type = AIEndpointType.Gemini,
                     Name = "Google Gemini",
                     Endpoint = "https://generativelanguage.googleapis.com/",
@@ -54,7 +54,7 @@ public class ApplicationConfig
             {
                 "OpenRouter", new Provider()
                 {
-                    ProviderName = "OpenRouter",
+                    ProviderId = "OpenRouter",
                     Type = AIEndpointType.OpenAI,
                     Name = "OpenRouter",
                     Endpoint = "https://openrouter.ai/api/v1",
@@ -66,7 +66,7 @@ public class ApplicationConfig
             {
                 "Azure", new Provider()
                 {
-                    ProviderName = "Azure",
+                    ProviderId = "Azure",
                     Type = AIEndpointType.OpenAI,
                     Name = "Azure OpenAI",
                     Endpoint = "https://YOUR_RESOURCE_NAME.openai.azure.com",
@@ -78,7 +78,7 @@ public class ApplicationConfig
             {
                 "Moonshot", new Provider()
                 {
-                    ProviderName = "Moonshot",
+                    ProviderId = "Moonshot",
                     Type = AIEndpointType.OpenAI,
                     Name = "月之暗面",
                     Endpoint = "https://api.moonshot.cn/v1",
@@ -90,7 +90,7 @@ public class ApplicationConfig
             {
                 "ChatGLM", new Provider()
                 {
-                    ProviderName = "ChatGLM",
+                    ProviderId = "ChatGLM",
                     Type = AIEndpointType.OpenAI,
                     Name = "智谱AI",
                     Endpoint = "https://open.bigmodel.cn/api/paas/v3",
@@ -102,7 +102,7 @@ public class ApplicationConfig
             {
                 "Qwen", new Provider()
                 {
-                    ProviderName = "Qwen",
+                    ProviderId = "Qwen",
                     Type = AIEndpointType.OpenAI,
                     Name = "通义千问",
                     Endpoint = "https://dashscope.aliyuncs.com/api/v1",
@@ -114,7 +114,7 @@ public class ApplicationConfig
             {
                 "SparkDesk", new Provider()
                 {
-                    ProviderName = "SparkDesk",
+                    ProviderId = "SparkDesk",
                     Type = AIEndpointType.OpenAI,
                     Name = "讯飞星火",
                     Endpoint = "https://spark-api.xf-yun.com/v1",
@@ -126,7 +126,7 @@ public class ApplicationConfig
             {
                 "Claude", new Provider()
                 {
-                    ProviderName = "Claude",
+                    ProviderId = "Claude",
                     Type = AIEndpointType.OpenAI,
                     Name = "Claude AI",
                     Endpoint = "https://api.anthropic.com/v1",
@@ -139,7 +139,7 @@ public class ApplicationConfig
             {
                 "TogetherAI", new Provider()
                 {
-                    ProviderName = "TogetherAI",
+                    ProviderId = "TogetherAI",
                     Type = AIEndpointType.OpenAI,
                     Name = "Together AI",
                     Endpoint = "https://api.together.xyz/v1",
@@ -151,7 +151,7 @@ public class ApplicationConfig
             {
                 "OLLAMA", new Provider()
                 {
-                    ProviderName = "OLLAMA",
+                    ProviderId = "OLLAMA",
                     Type = AIEndpointType.OLLAMA,
                     Name = "LLAMA 本地模型",
                     Endpoint = "http://localhost:8080",
@@ -162,7 +162,7 @@ public class ApplicationConfig
             }
         };
 
-        public string ProviderName { get; set; } = "";
+        public string ProviderId { get; set; } = "";
         public AIEndpointType Type { get; set; } = AIEndpointType.OpenAI;
         public string Name { get; set; } = "自定义";
         public string Endpoint { get; set; } = "";
@@ -176,7 +176,7 @@ public class ApplicationConfig
         {
             return new Provider
             {
-                ProviderName = this.ProviderName,
+                ProviderId = this.ProviderId,
                 Type = this.Type,
                 Name = this.Name,
                 Endpoint = this.Endpoint,

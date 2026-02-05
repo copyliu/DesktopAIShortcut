@@ -91,39 +91,6 @@ public partial class MainWindow : Window
 
     private void InitializeChat()
     {
-        try
-        {
-            AISettings.Instance.LoadSettings();
-            // 修改此处的初始化方式
-            client = new ChatClient(
-                AISettings.Instance.Model,
-                new ApiKeyCredential(AISettings.Instance.Key),
-                new OpenAIClientOptions
-                {
-                    Endpoint = new Uri(AISettings.Instance.Endpoint)
-                });
-
-            defaultMsg.DataContext = DefaultMsg;
-        }
-        catch (Exception e)
-        {
-            defaultMsg.DataContext = new ChatMsgViewModel()
-            {
-                UserName = "AI",
-                Markdown = "初始化错误, 请在托盘图标点击右键, 选择设置中确认你已经设置好API信息. ",
-               Role =ChatRole.Assistant
-            };
-            client = null;
-        }
-
-        if (client != null)
-        {
-            EnableInput();
-        }
-        else
-        {
-            DisableInput();
-        }
     }
 
     private void HistoryItem_OnClick(object? sender, RoutedEventArgs e)
@@ -149,6 +116,7 @@ public partial class MainWindow : Window
     private void NewChat_OnClick(object? sender, RoutedEventArgs e)
     {
         _currentChat = new ChatHistoryViewModel();
+        this.CurrentChatPanel.DataContext = _currentChat;
         _isAutoSaving = true;
         _models.Clear();
         _isAutoSaving = false;
@@ -170,11 +138,11 @@ public partial class MainWindow : Window
         this.Hide();
     }
 
-    private void InputElement_OnKeyUp(object? sender, KeyEventArgs e)
+    private async void InputElement_OnKeyUp(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter && e.KeyModifiers==KeyModifiers.Control)
         {
-            this.SendBtn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await this._currentChat.AddUserMessageAsync();
         }
     }
 
@@ -300,9 +268,37 @@ public partial class MainWindow : Window
     public void NewChat()
     {
         _currentChat = new ChatHistoryViewModel();
+        this.CurrentChatPanel.DataContext = _currentChat;
         _isAutoSaving = true;
         _models.Clear();
         _isAutoSaving = false;
         InitializeChat();
+    }
+
+    private void ModelList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        var cb = sender as ComboBox;
+        if (cb == null)
+        {
+            return;
+            
+        }
+
+        var value = cb.SelectedItem as ModelSelectionViewModel;
+        if (value==null)
+        {
+            return;
+        }
+
+        var selectedmodel=ApplicationConfig.Instance.Providers.Where(p => p.ProviderId == value.SelectedProvider.ProviderId)
+            .FirstOrDefault();
+        if (selectedmodel == null)
+        {
+            return;
+        }
+
+        _currentChat.ProviderId = selectedmodel.ProviderId;
+        _currentChat.ModelName = value.SelectedModel;
+
     }
 }

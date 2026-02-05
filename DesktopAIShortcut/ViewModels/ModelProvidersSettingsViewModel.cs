@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -52,11 +53,11 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
             
         foreach (var templateProvider in ApplicationConfig.Provider.ProviderTemplates)
         {
-            var selected = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderName == templateProvider.Key);
+            var selected = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == templateProvider.Key);
                 
             var modelProvider = new ModelProvider
             {
-                ProviderName=templateProvider.Value.ProviderName,
+                ProviderId=templateProvider.Value.ProviderId,
                 Name = templateProvider.Value.Name,
                 IsEnabled = selected?.Enabled==true,
                 ApiEndpoint = selected?.Endpoint ?? templateProvider.Value.Endpoint,
@@ -70,11 +71,11 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
             Providers.Add(modelProvider);
         }
 
-        foreach (var provider in ApplicationConfig.Instance.Providers.Where(p=>!ApplicationConfig.Provider.ProviderTemplates.Keys.Contains(p.ProviderName)))
+        foreach (var provider in ApplicationConfig.Instance.Providers.Where(p=>!ApplicationConfig.Provider.ProviderTemplates.Keys.Contains(p.ProviderId)))
         {
             var modelProvider = new ModelProvider
             {
-                ProviderName= provider.ProviderName,
+                ProviderId= provider.ProviderId,
                 Name = provider.Name,
                 IsEnabled = provider.Enabled==true,
                 ApiEndpoint = provider.Endpoint  ,
@@ -136,10 +137,10 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
         var providerList=new List<ApplicationConfig.Provider>();
         foreach (var provider in Providers)
         {
-            ApplicationConfig.Provider.ProviderTemplates.TryGetValue(provider.ProviderName, out var template);
+            ApplicationConfig.Provider.ProviderTemplates.TryGetValue(provider.ProviderId, out var template);
             var selectedProvider = new ApplicationConfig.Provider
             {
-                ProviderName = provider.ProviderName,
+                ProviderId = provider.ProviderId,
                 Endpoint = provider.ApiEndpoint,
                 Key = provider.ApiKey,
                 Model = provider.SelectedModels.ToArray(),
@@ -158,20 +159,11 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
     [RelayCommand]
     private void AddCustomModel()
     {
-        if (SelectedProvider == null || string.IsNullOrWhiteSpace(SelectedProvider.CustomModelInput)) 
-            return;
-                
-        var modelName = SelectedProvider.CustomModelInput.Trim();
-            
-        // 确保不重复添加
-        if (!SelectedProvider.AvailableModels.Contains(modelName))
-        {
-            SelectedProvider.AvailableModels.Add(modelName);
-            this.ToggleModelSelection(modelName);
-        }
-            
-        // 清空输入框
-        SelectedProvider.CustomModelInput = string.Empty;
+        var newmodel = new ModelProvider();
+        newmodel.ProviderId = Guid.NewGuid().ToString();
+        SelectedProvider= newmodel;
+        Providers.Add(newmodel);
+        
     }
     [RelayCommand]
     private void RemoveSelectedModel(string modelName)

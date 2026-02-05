@@ -15,14 +15,14 @@ namespace DesktopAIShortcut.Models
         private ObservableCollection<string> _availableModels;
         private string _customModelInput;
         private ApplicationConfig.AIEndpointType _endpointType = ApplicationConfig.AIEndpointType.OpenAI;
-        private string _providerName;
+        private string _providerId;
 
         public bool FromTemplate { get; internal set; }
         
-        public string ProviderName
+        public string ProviderId
         {
-            get => _providerName;
-            set => SetProperty(ref _providerName, value);
+            get => _providerId;
+            set => SetProperty(ref _providerId, value);
         }
 
         public string Name
