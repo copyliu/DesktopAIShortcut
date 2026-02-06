@@ -120,7 +120,7 @@
         
         <!-- 底部按钮区 -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,10,10" Spacing="10">
-            <Button Content="添加自定义提供商" Command="{Binding AddCustomModelCommand}"/>
+            <Button Content="添加自定义提供商" Command="{Binding AddCustomProvider}"/>
             <Button Content="保存设置" Command="{Binding SaveSettingsCommand}"/>
         </StackPanel>
     </Grid>

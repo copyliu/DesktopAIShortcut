@@ -159,6 +159,24 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
     [RelayCommand]
     private void AddCustomModel()
     {
+        if (SelectedProvider == null || string.IsNullOrWhiteSpace(SelectedProvider.CustomModelInput)) 
+            return;
+                
+        var modelName = SelectedProvider.CustomModelInput.Trim();
+            
+        // 确保不重复添加
+        if (!SelectedProvider.AvailableModels.Contains(modelName))
+        {
+            SelectedProvider.AvailableModels.Add(modelName);
+            this.ToggleModelSelection(modelName);
+        }
+            
+        // 清空输入框
+        SelectedProvider.CustomModelInput = string.Empty;
+    }
+    [RelayCommand]
+    private void AddCustomProvider()
+    {
         var newmodel = new ModelProvider();
         newmodel.ProviderId = Guid.NewGuid().ToString();
         SelectedProvider= newmodel;
