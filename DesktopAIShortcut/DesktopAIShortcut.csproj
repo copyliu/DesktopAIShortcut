@@ -2,7 +2,7 @@
     <PropertyGroup>
         
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -15,7 +15,7 @@
 	    <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-        <TargetFramework>net9.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
 
         <UseWindowsForms>true</UseWindowsForms>
        <OutputType>WinExe</OutputType>

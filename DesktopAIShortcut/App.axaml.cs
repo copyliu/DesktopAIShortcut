@@ -6,25 +6,37 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using DesktopAIShortcut.Models;
+using DesktopAIShortcut.ViewModels;
 
 namespace DesktopAIShortcut
 {
     public partial class App : Application
     {
+        private   MainWindow _mainWindow;
+        public const int DefaultWidth = 500;
+        public const int DefaultHeight = 300;
         public override void Initialize()
         {
            ApplicationConfig.LoadSettings();
             AvaloniaXamlLoader.Load(this);
+            _mainWindow = new MainWindow
+            {
+                SizeToContent = SizeToContent.Manual,
+                CanResize = true,
+                Width = DefaultWidth,
+                Height = DefaultHeight,
+                WindowStartupLocation = WindowStartupLocation.Manual,
+                DataContext = new ApplicationViewModel()
+            };
         }
 
-        private ApplicationViewModel context;
 
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                context = new ApplicationViewModel();
+               
             }
             base.OnFrameworkInitializationCompleted();
         }
@@ -41,7 +53,15 @@ namespace DesktopAIShortcut
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                context?.ShowWindow();
+                desktop.MainWindow = _mainWindow;
+                _mainWindow.Show();
+                _mainWindow.WindowState = WindowState.Normal;
+                _mainWindow.BringIntoView();
+                _mainWindow.Focus();
+
+                // 确保窗口在最前面
+                _mainWindow.Topmost = true;
+                _mainWindow.Topmost = false;
 
 #if WINDOWS
                 var screen = desktop.MainWindow.Screens.Primary;
@@ -78,7 +98,7 @@ namespace DesktopAIShortcut
                         windowX = screen.WorkingArea.X + 10;
                     }
 
-                    context?.SetWindowPosition((int)(windowX), (int)(windowY));
+                    SetWindowPosition((int)(windowX), (int)(windowY));
                 }
                 else
                 {
@@ -98,9 +118,31 @@ namespace DesktopAIShortcut
                         windowX = screen.WorkingArea.X + 10;
                     }
 
-                    context?.SetWindowPosition((int)(windowX), (int)(windowY));
+                    SetWindowPosition((int)(windowX), (int)(windowY));
                 }
 #endif
+            }
+        }
+
+        public void HideWindow()
+        {
+            _mainWindow.Hide();
+        }
+
+        public void SetWindowPosition(int windowX, int windowY)
+        {
+            // _mainWindow.Width = DefaultWidth;
+            // _mainWindow.Height = DefaultHeight;
+
+            // 确保在设置位置之前窗口已经初始化但未显示
+            if (!_mainWindow.IsVisible)
+            {
+                _mainWindow.WindowState = WindowState.Normal;
+                _mainWindow.Position = new PixelPoint(windowX, windowY);
+            }
+            else
+            {
+                _mainWindow.Position = new PixelPoint(windowX, windowY);
             }
         }
 

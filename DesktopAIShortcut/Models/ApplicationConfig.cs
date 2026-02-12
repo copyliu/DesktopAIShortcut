@@ -13,6 +13,9 @@ namespace DesktopAIShortcut.Models;
 
 public class ApplicationConfig
 {
+    // 配置保存成功事件
+    public event EventHandler? OnSettingsSaved;
+
     public static ApplicationConfig Instance => _instance;
 
     public enum AIEndpointType
@@ -247,6 +250,9 @@ public class ApplicationConfig
         // 序列化 AISettings 对象为 JSON 格式，并写入文件
         File.WriteAllText(savefilename,
             System.Text.Json.JsonSerializer.Serialize(this, SourceGenerationContext.Default.ApplicationConfig));
+        
+        // 触发配置保存成功事件
+        OnSettingsSaved?.Invoke(this, EventArgs.Empty);
     }
 
     // 加载设置从配置文件

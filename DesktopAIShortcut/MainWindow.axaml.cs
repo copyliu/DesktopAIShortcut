@@ -25,34 +25,21 @@ namespace DesktopAIShortcut;
 public partial class MainWindow : Window
 {
     private ChatClient? client;
-    private ObservableCollection<ChatMsgViewModel> _models = new ObservableCollection<ChatMsgViewModel>();
     private ChatHistoryService _historyService = new ChatHistoryService();
-    private ChatHistoryViewModel _currentChat = new ChatHistoryViewModel();
     private bool _isAutoSaving = false; // 添加标志位避免循环保存
     private PromptTemplatesViewModel _promptTemplatesViewModel = new PromptTemplatesViewModel();
     public MainWindow()
     {
         InitializeComponent();
         if (Design.IsDesignMode) return;
+        ApplicationConfig.Instance.OnSettingsSaved += (sender, args) =>
+        {
+            ModelList.ItemsSource = ApplicationConfig.Instance.ModelList;
+        };
         ModelList.ItemsSource = ApplicationConfig.Instance.ModelList;
         PromptPreset.ItemsSource = _promptTemplatesViewModel.PromptTemplates;
-        ItemsControl.ItemsSource = _models;
 
-        RefreshHistoryList();
 
-        InitializeChat();
-
-        //HistoryList.ItemsSource = _historyService.LoadAllChats();
-
-        // 监听消息集合变化，自动保存
-        _models.CollectionChanged += (sender, args) =>
-        {
-            if (_isAutoSaving) return; // 如果是自动加载历史记录，不触发保存
-
-            _currentChat.Messages = _models;
-            _historyService.SaveChat(_currentChat);
-            RefreshHistoryList();
-        };
 
         if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
@@ -63,74 +50,8 @@ public partial class MainWindow : Window
         
     }
 
-    public ChatMsgViewModel DefaultMsg => new ChatMsgViewModel()
-    {
-        UserName = AISettings.Instance.AIName,
-        Markdown = AISettings.Instance.AIName + "：你好。",
-        Role = ChatRole.Assistant
-    };
+   
 
-    void EnableInput()
-    {
-        this.ChatInput.IsEnabled = true;
-        this.SendBtn.IsEnabled = true;
-        this.ChatInput.Text = "";
-        this.ChatInput.Focus();
-    }
-
-    void DisableInput()
-    {
-        this.ChatInput.IsEnabled = false;
-        this.SendBtn.IsEnabled = false;
-    }
-
-    private void RefreshHistoryList()
-    {
-        HistoryList.ItemsSource = _historyService.LoadAllChats();
-    }
-
-    private void InitializeChat()
-    {
-    }
-
-    private void HistoryItem_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.DataContext is ChatHistoryViewModel chat)
-        {
-            _currentChat = chat;
-            _isAutoSaving = true; // 设置标志位，避免触发自动保存
-            _models.Clear();
-            foreach (var msg in chat.Messages)
-            {
-                _models.Add(msg);
-            }
-            _isAutoSaving = false; // 恢复自动保存
-
-            if (client == null)
-            {
-                InitializeChat();
-            }
-        }
-    }
-
-    private void NewChat_OnClick(object? sender, RoutedEventArgs e)
-    {
-        _currentChat = new ChatHistoryViewModel();
-        this.CurrentChatPanel.DataContext = _currentChat;
-        _isAutoSaving = true;
-        _models.Clear();
-        _isAutoSaving = false;
-        InitializeChat();
-    }
-
-    private void DeleteHistory_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.DataContext is ChatHistoryViewModel chat)
-        {
-            _historyService.DeleteChat(chat.Id);
-            RefreshHistoryList();
-        }
-    }
 
     private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
     {
@@ -142,138 +63,11 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter && e.KeyModifiers==KeyModifiers.Control)
         {
-            await this._currentChat.AddUserMessageAsync();
+               (this.DataContext  as ApplicationViewModel )?.ChatHistoryListViewModel?.CurrentChatHistoryViewModel? .AddUserMessageAsync();
         }
     }
 
-    private async void SendBtn_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var userMessage = new ChatMsgViewModel()
-        {
-            UserName = "用户",
-            Markdown = this.ChatInput.Text?.Trim() + "",
-            Role =ChatRole.User
-        };
 
-        DisableInput();
-        _models.Add(userMessage);
-        ScrollViewer.ScrollToEnd();
-
-        var model = new ChatMsgViewModel()
-        {
-            UserName = AISettings.Instance.AIName,
-            Markdown = "",
-          Role =ChatRole.Assistant
-        };
-        //
-        // try
-        // {
-        //     var messages = new List<OpenAI.Chat.ChatMessage>();
-        //     // 添加聊天前的预定义消息
-        //     messages.AddRange(AISettings.Instance.ContextMessages
-        //         .Where(m => m.IsBeforeChat)
-        //         .OrderBy(m => m.Order)
-        //         .Select(m => m.ChatMessage));
-        //     // 添加当前聊天消息
-        //     messages.AddRange(_models.Select(p => p.ChatMessage));
-        //     // 添加聊天后的预定义消息
-        //     messages.AddRange(AISettings.Instance.ContextMessages
-        //         .Where(m => !m.IsBeforeChat)
-        //         .OrderBy(m => m.Order)
-        //         .Select(m => m.ChatMessage));
-        //
-        //     // 创建选项并设置参数
-        //     var options = new ChatCompletionOptions();
-        //
-        //     // 设置参数
-        //     if (AISettings.Instance.EnableAdvancedSettings != false)
-        //     {
-        //         options.MaxOutputTokenCount = AISettings.Instance.MaxTokens;
-        //         options.Temperature = AISettings.Instance.Temperature;
-        //         options.FrequencyPenalty = AISettings.Instance.FrequencyPenalty;
-        //         options.PresencePenalty = AISettings.Instance.PresencePenalty;
-        //         options.TopP = AISettings.Instance.TopP;
-        //     }
-        //
-        //     // 将其他参数添加到 Metadata 中
-        //     // 注意：仅备用，应该不会生效，叼库不支持
-        //     //options.Metadata["temperature"] = AISettings.Instance.Temperature.ToString();
-        //     options.Metadata["top_k"] = AISettings.Instance.TopK.ToString();
-        //     //options.Metadata["frequency_penalty"] = AISettings.Instance.FrequencyPenalty.ToString();
-        //     options.Metadata["repetition_penalty"] = AISettings.Instance.RepetitionPenalty.ToString();
-        //     options.Metadata["context_window_size"] = AISettings.Instance.ContextWindowSize.ToString();
-        //
-        //     _models.Add(model);
-        //
-        //     // 在调用请求前添加日志记录
-        //     if (AISettings.Instance.EnableLogging != false)
-        //     {
-        //         var logPath = Path.Combine(
-        //         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        //         "DesktopAIShortcut",
-        //         "requests.log"
-        //     );
-        //
-        //         // 构造日志对象
-        //         var logEntry = new
-        //         {
-        //             Timestamp = DateTime.UtcNow.ToString("o"),
-        //             Model = model, // 假设 ChatClient 有 Model 属性
-        //             Messages = messages,
-        //             Options = options
-        //         };
-        //
-        //         // 序列化为 JSON 并追加写入文件
-        //         var json = JsonSerializer.Serialize(logEntry, new JsonSerializerOptions
-        //         {
-        //             WriteIndented = true
-        //         });
-        //
-        //         File.AppendAllText(logPath, $"{json}\n\n"); // 用空行分隔不同请求
-        //     }
-        //     // 使用带选项的调用方式
-        //     var ret = client.CompleteChatStreamingAsync(messages.ToArray(), options);
-        //     await foreach (var r in ret)
-        //     {
-        //         if (r.ContentUpdate.Any())
-        //         {
-        //             model.Markdown += r.ContentUpdate[0].Text;
-        //             ScrollViewer.ScrollToEnd();
-        //         }
-        //     }
-        //
-        //     // 保存聊天记录
-        //     _currentChat.Messages = _models.ToList();
-        //     if (string.IsNullOrEmpty(_currentChat.Title) && _models.Count > 0)
-        //     {
-        //         // 使用用户的第一条消息作为标题
-        //         var firstUserMessage = _models.FirstOrDefault(m => m.IsUser)?.Markdown;
-        //         _currentChat.Title = !string.IsNullOrEmpty(firstUserMessage)
-        //             ? firstUserMessage.Substring(0, Math.Min(30, firstUserMessage.Length))
-        //             : "新对话";
-        //     }
-        //     _historyService.SaveChat(_currentChat);
-        //     RefreshHistoryList();
-        // }
-        // catch (Exception exception)
-        // {
-        //     model.Markdown += "\n\n出现错误：" + exception.Message;
-        // }
-        // finally
-        // {
-        //     EnableInput();
-        // }
-    }
-
-    public void NewChat()
-    {
-        _currentChat = new ChatHistoryViewModel();
-        this.CurrentChatPanel.DataContext = _currentChat;
-        _isAutoSaving = true;
-        _models.Clear();
-        _isAutoSaving = false;
-        InitializeChat();
-    }
 
     private void ModelList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -297,8 +91,18 @@ public partial class MainWindow : Window
             return;
         }
 
-        _currentChat.ProviderId = selectedmodel.ProviderId;
-        _currentChat.ModelName = value.SelectedModel;
+        (this.DataContext  as ApplicationViewModel )?.ChatHistoryListViewModel?.CurrentChatHistoryViewModel.ProviderId = selectedmodel.ProviderId;
+        (this.DataContext  as ApplicationViewModel )?.ChatHistoryListViewModel?.CurrentChatHistoryViewModel.ModelName = value.SelectedModel;
 
+    }
+
+    private void HistoryItem_OnClick(object? sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void DeleteHistory_OnClick(object? sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 }
