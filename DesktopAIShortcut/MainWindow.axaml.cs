@@ -27,19 +27,11 @@ public partial class MainWindow : Window
     private ChatClient? client;
     private ChatHistoryService _historyService = new ChatHistoryService();
     private bool _isAutoSaving = false; // 添加标志位避免循环保存
-    private PromptTemplatesViewModel _promptTemplatesViewModel = new PromptTemplatesViewModel();
-    public MainWindow()
+     public MainWindow()
     {
         InitializeComponent();
         if (Design.IsDesignMode) return;
-        ApplicationConfig.Instance.OnSettingsSaved += (sender, args) =>
-        {
-            ModelList.ItemsSource = ApplicationConfig.Instance.ModelList;
-        };
-        ModelList.ItemsSource = ApplicationConfig.Instance.ModelList;
-        PromptPreset.ItemsSource = _promptTemplatesViewModel.PromptTemplates;
-
-
+       
 
         if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using DesktopAIShortcut.Models;
 
 namespace DesktopAIShortcut.ViewModels;
 
@@ -14,9 +16,17 @@ public partial class ApplicationViewModel:INotifyPropertyChanged
     public const int DefaultHeight = 300;
     public ChatHistoryListViewModel ChatHistoryListViewModel { get; } = new ChatHistoryListViewModel();
 
+    
+    public List<ModelSelectionViewModel> ModelList=>ApplicationConfig.Instance. Providers.Select(p=>p.Model.Select(m=>new ModelSelectionViewModel(p,m))).SelectMany(t=>t).ToList();
+    public List<PromptTemplate> PromptTemplates => ApplicationConfig.Instance.ChatPresets.Select(p=>new PromptTemplate(p)).ToList();
+
     public ApplicationViewModel()
     {
-     
+        ApplicationConfig.Instance.OnSettingsSaved+= (sender, args) =>
+        {
+            OnPropertyChanged(nameof(ModelList));
+            OnPropertyChanged(nameof(PromptTemplates));
+        };
     }
 
 

@@ -242,9 +242,6 @@ public class ApplicationConfig
     public List<Provider> Providers { get; set; } = new List<Provider>();
     public List<ChatPreset> ChatPresets { get; set; } = new List<ChatPreset>();
     public List<RemoteMCPServer> RemoteMCPServers { get; set; } = new List<RemoteMCPServer>();
-    [JsonIgnore]
-    public List<ModelSelectionViewModel> ModelList=>Providers.Select(p=>p.Model.Select(m=>new ModelSelectionViewModel(p,m))).SelectMany(t=>t).ToList();
-
     public void SaveSettings()
     {
         // 序列化 AISettings 对象为 JSON 格式，并写入文件

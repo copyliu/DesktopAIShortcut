@@ -33,31 +33,7 @@ namespace DesktopAIShortcut.ViewModels
 
             foreach (var instanceChatPreset in ApplicationConfig.Instance.ChatPresets)
             {
-                var template = new PromptTemplate
-                {
-                    Name = instanceChatPreset.Name,
-                   PrefixMessages = new ObservableCollection<ChatMessage>( instanceChatPreset.ContextMessages.Where(p=>!p.IsBeforeChat)
-                       .OrderBy(p=>p.Order)
-                       
-                       .Select(p=>new ChatMessage()
-                       {
-                           Content = p.Content,
-                           Role = new ChatRole(p.Role)
-                           
-                       })),
-                    Temperature = instanceChatPreset.Temperature,
-                    MaxTokens = instanceChatPreset.MaxTokens,
-                    IsDefault = instanceChatPreset.IsDefault,
-                 SuffixMessages =  new ObservableCollection<ChatMessage>( instanceChatPreset.ContextMessages.Where(p=>p.IsBeforeChat)
-                     .OrderBy(p=>p.Order)
-                       
-                     .Select(p=>new ChatMessage()
-                     {
-                         Content = p.Content,
-                         Role = new ChatRole(p.Role)
-                           
-                     })),
-                };
+                var template = new PromptTemplate(instanceChatPreset);
                 PromptTemplates.Add(template);
             }
             

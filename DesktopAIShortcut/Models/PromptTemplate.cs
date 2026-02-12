@@ -2,23 +2,50 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.AI;
 
 namespace DesktopAIShortcut.Models
 {
     public class PromptTemplate : INotifyPropertyChanged
     {
         private string _name;
-        private string _systemPrompt;
-        private ObservableCollection<ChatMessage> _prefixMessages;
-        private ObservableCollection<ChatMessage> _suffixMessages;
+        private ObservableCollection<ChatMessage> _prefixMessages = [];
+        private ObservableCollection<ChatMessage> _suffixMessages = [];
         private double _temperature = 0.7;
         private int _maxTokens = 2000;
         private bool _isDefault;
 
         public PromptTemplate()
         {
-            PrefixMessages = new ObservableCollection<ChatMessage>();
-            SuffixMessages = new ObservableCollection<ChatMessage>();
+            _name = "新模板";
+        }
+
+        public PromptTemplate(ApplicationConfig.ChatPreset chatPreset)
+        {
+            _name = chatPreset.Name;
+            _temperature = chatPreset.Temperature;
+            _maxTokens = chatPreset.MaxTokens;
+            _isDefault = chatPreset.IsDefault;
+
+            _prefixMessages = new ObservableCollection<ChatMessage>(
+                chatPreset.ContextMessages
+                    .Where(p => !p.IsBeforeChat)
+                    .OrderBy(p => p.Order)
+                    .Select(p => new ChatMessage()
+                    {
+                        Content = p.Content,
+                        Role = new ChatRole(p.Role)
+                    }));
+
+            _suffixMessages = new ObservableCollection<ChatMessage>(
+                chatPreset.ContextMessages
+                    .Where(p => p.IsBeforeChat)
+                    .OrderBy(p => p.Order)
+                    .Select(p => new ChatMessage()
+                    {
+                        Content = p.Content,
+                        Role = new ChatRole(p.Role)
+                    }));
         }
 
         public string Name
@@ -60,7 +87,7 @@ namespace DesktopAIShortcut.Models
             set => SetProperty(ref _isDefault, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
