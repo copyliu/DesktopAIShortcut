@@ -97,8 +97,16 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
     public bool SingleAnswerMode
     {
         get => _singleAnswerMode;
-        set => SetField(ref _singleAnswerMode, value);
+        set
+        {
+            if (SetField(ref _singleAnswerMode, value))
+                OnPropertyChanged(nameof(LastAssistant));
+        }
     }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ChatMsgViewModel? LastAssistant =>
+        _messages.LastOrDefault(m => m.Role.Value == "assistant");
 
 
 
@@ -112,7 +120,16 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
             foreach (var msg in SelectedPromptTemplate.PrefixMessages)
                 result.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
         }
-        result.AddRange(_messages.Take(_messages.Count - 1));
+        if (SingleAnswerMode)
+        {
+            var lastUser = _messages.LastOrDefault(m => m.Role.Value == "user");
+            if (lastUser != null)
+                result.Add(lastUser);
+        }
+        else
+        {
+            result.AddRange(_messages.Take(_messages.Count - 1));
+        }
         if (SelectedPromptTemplate != null)
         {
             foreach (var msg in SelectedPromptTemplate.SuffixMessages)
@@ -184,6 +201,9 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
 [RelayCommand]
     public async Task AddUserMessageAsync()
     {
+        if (SingleAnswerMode)
+            _messages.Clear();
+
         _messages.Add(new ChatMsgViewModel()
         {
             Role = ChatRole.User,
@@ -199,6 +219,7 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
             UserName = "AI助手"
         };
         this.Messages.Add(response);
+        OnPropertyChanged(nameof(LastAssistant));
 
         try
         {
@@ -212,6 +233,8 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
         {
             response.Markdown = $"**调用失败**: {ex.Message}";
         }
+
+        OnPropertyChanged(nameof(LastAssistant));
 
         var historyService = new ChatHistoryService();
         historyService.SaveChat(this);
@@ -244,6 +267,8 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
         {
             response.Markdown = $"**调用失败**: {ex.Message}";
         }
+
+        OnPropertyChanged(nameof(LastAssistant));
 
         var historyService = new ChatHistoryService();
         historyService.SaveChat(this);

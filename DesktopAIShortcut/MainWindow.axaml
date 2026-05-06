@@ -83,7 +83,7 @@
 		<DockPanel Grid.Row="1" Grid.Column="2" IsHitTestVisible="True"  x:Name="CurrentChatPanel"  DataContext="{Binding ChatHistoryListViewModel.CurrentChatHistoryViewModel  }"
 		           IsEnabled="{Binding Converter={x:Static ObjectConverters.IsNotNull}  }"
 		           >
-			<DockPanel DockPanel.Dock="Bottom"  >
+			<DockPanel DockPanel.Dock="Bottom" IsVisible="{Binding !SingleAnswerMode}" >
 				<Button DockPanel.Dock="Right" Content="△" x:Name="SendBtn" Command="{Binding AddUserMessageAsync}"  VerticalContentAlignment="Stretch"  />
 				<TextBox Text="{Binding UserInput}" AcceptsReturn="True" HorizontalAlignment="Stretch" KeyUp="InputElement_OnKeyUp" x:Name="ChatInput"   />
 			</DockPanel>
@@ -134,24 +134,28 @@
   <Border Grid.Column="2" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1" VerticalAlignment="Stretch">
     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
       <TextBlock Text="问答模式" VerticalAlignment="Center" FontSize="12"/>
-      <ToggleSwitch Width="52"  VerticalAlignment="Center" Margin="4,0,0,0"/>
+      <ToggleSwitch Width="52"  VerticalAlignment="Center" Margin="4,0,0,0"
+                    IsChecked="{Binding SingleAnswerMode}"/>
     </StackPanel>
   </Border>
 </Grid>
 
-			<ScrollViewer x:Name="ScrollViewer">
-				<StackPanel>
-					<!-- <desktopAiShortcut:ChatMsgControl DockPanel.Dock="Top" x:Name="defaultMsg" Margin="10"/> -->
-					<ItemsControl x:Name="ItemsControl" ItemsSource="{Binding  Path=Messages}">
-						<ItemsControl.ItemTemplate>
-							<DataTemplate x:DataType="viewModels:ChatMsgViewModel">
-								<desktopAiShortcut:ChatMsgControl Margin="10" DataContext="{Binding .}" x:DataType="viewModels:ChatMsgViewModel"/>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
-					</ItemsControl>
-					<Border Height="30"/>
-				</StackPanel>
-			</ScrollViewer>
+			<Grid>
+				<ScrollViewer x:Name="ScrollViewer" IsVisible="{Binding !SingleAnswerMode}">
+					<StackPanel>
+						<ItemsControl x:Name="ItemsControl" ItemsSource="{Binding  Path=Messages}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="viewModels:ChatMsgViewModel">
+									<desktopAiShortcut:ChatMsgControl Margin="10" DataContext="{Binding .}" x:DataType="viewModels:ChatMsgViewModel"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<Border Height="30"/>
+					</StackPanel>
+				</ScrollViewer>
+
+				<desktopAiShortcut:QAModeView IsVisible="{Binding SingleAnswerMode}" />
+			</Grid>
 		</DockPanel>
 	</Grid>
 </Window>
