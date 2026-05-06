@@ -31,15 +31,26 @@ public partial class ChatMsgControl : UserControl
         }
     }
 
+    private ChatMsgViewModel? _subscribedViewModel;
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        UpdateVisibility();
+
+        if (_subscribedViewModel != null)
+            _subscribedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
 
         if (DataContext is ChatMsgViewModel vm)
         {
+            _subscribedViewModel = vm;
             vm.PropertyChanged += OnViewModelPropertyChanged;
         }
+        else
+        {
+            _subscribedViewModel = null;
+        }
+
+        UpdateVisibility();
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -66,7 +77,7 @@ public partial class ChatMsgControl : UserControl
 
         var isAssistant = vm.Role.Value == "assistant" || vm.Role.Value == "system";
         ActionsPanel.IsVisible = isAssistant && !vm.IsThinking;
-        ReasoningExpander.IsVisible = isAssistant && vm.HasReasoning;
+        ReasoningExpander.IsVisible = isAssistant && (vm.HasReasoning || vm.IsThinking);
         ReasoningExpander.IsExpanded = isAssistant && vm.IsThinking;
     }
 
