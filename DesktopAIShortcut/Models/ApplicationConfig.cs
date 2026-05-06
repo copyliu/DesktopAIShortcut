@@ -266,11 +266,51 @@ public class ApplicationConfig
         }
         else
         {
-            // 如果文件不存在，则创建一个空的设置文件
-            File.WriteAllText(savefilename, "{}");
             _instance = new ApplicationConfig();
-
         }
+
+        EnsureDefaults();
+    }
+
+    private static void EnsureDefaults()
+    {
+        if (_instance.ChatPresets != null && _instance.ChatPresets.Count > 0)
+            return;
+
+        _instance.ChatPresets = new List<ChatPreset>
+        {
+            new ChatPreset
+            {
+                Name = "通用助手",
+                IsDefault = true,
+                Temperature = 0.7,
+                MaxTokens = 2000,
+                ContextMessages = new List<ContextMessage>
+                {
+                    new ContextMessage { Role = "System", Content = "你是一个通用的AI助手，能够回答各种问题。", IsBeforeChat = false, Order = 0 }
+                }
+            },
+            new ChatPreset
+            {
+                Name = "代码专家",
+                Temperature = 0.3,
+                MaxTokens = 3000,
+                ContextMessages = new List<ContextMessage>
+                {
+                    new ContextMessage { Role = "System", Content = "你是一个专业的编程助手，擅长编写和解释代码，并提供详细的代码示例。", IsBeforeChat = false, Order = 0 }
+                }
+            },
+            new ChatPreset
+            {
+                Name = "创意写作",
+                Temperature = 0.9,
+                MaxTokens = 2500,
+                ContextMessages = new List<ContextMessage>
+                {
+                    new ContextMessage { Role = "System", Content = "你是一个创意写作助手，可以帮助用户创作故事、诗歌和其他创意内容。", IsBeforeChat = false, Order = 0 }
+                }
+            }
+        };
     }
 
 }
