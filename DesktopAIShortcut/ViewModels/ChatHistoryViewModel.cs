@@ -122,39 +122,66 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
             UserName = "AI助手"
         };
         this.Messages.Add(response);
-        var provider=ApplicationConfig.Instance.Providers.First(p=>p.ProviderId==ProviderId);
-        var adap = new OpenAIAdapter(provider, ModelName);
 
-        var messagesToSend = new List<ChatMsgViewModel>();
-
-        if (SelectedPromptTemplate != null)
+        try
         {
-            foreach (var msg in SelectedPromptTemplate.PrefixMessages)
+            var provider = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == ProviderId);
+            if (provider == null)
             {
-                messagesToSend.Add(new ChatMsgViewModel()
-                {
-                    Role = msg.Role,
-                    Markdown = msg.Content
-                });
+                response.Markdown = "**错误**: 未选择大模型供应商，请在设置中配置。";
+                return;
             }
+
+            if (string.IsNullOrEmpty(ModelName))
+            {
+                response.Markdown = "**错误**: 未选择模型，请在上方下拉框中选择。";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(provider.Key))
+            {
+                response.Markdown = "**错误**: 未设置API密钥，请在设置中配置。";
+                return;
+            }
+
+            var adap = new OpenAIAdapter(provider, ModelName);
+
+            var messagesToSend = new List<ChatMsgViewModel>();
+
+            if (SelectedPromptTemplate != null)
+            {
+                foreach (var msg in SelectedPromptTemplate.PrefixMessages)
+                {
+                    messagesToSend.Add(new ChatMsgViewModel()
+                    {
+                        Role = msg.Role,
+                        Markdown = msg.Content
+                    });
+                }
+            }
+
+            messagesToSend.AddRange(this._messages.Take(this._messages.Count - 1));
+
+            if (SelectedPromptTemplate != null)
+            {
+                foreach (var msg in SelectedPromptTemplate.SuffixMessages)
+                {
+                    messagesToSend.Add(new ChatMsgViewModel()
+                    {
+                        Role = msg.Role,
+                        Markdown = msg.Content
+                    });
+                }
+            }
+
+            var resp = await adap.SendMessageAsync(messagesToSend);
+            response.Markdown = resp.Markdown;
+            response.UserName = resp.UserName;
         }
-
-        messagesToSend.AddRange(this._messages.Take(this._messages.Count - 1));
-
-        if (SelectedPromptTemplate != null)
+        catch (Exception ex)
         {
-            foreach (var msg in SelectedPromptTemplate.SuffixMessages)
-            {
-                messagesToSend.Add(new ChatMsgViewModel()
-                {
-                    Role = msg.Role,
-                    Markdown = msg.Content
-                });
-            }
+            response.Markdown = $"**调用失败**: {ex.Message}";
         }
-
-        var resp = await adap.SendMessageAsync(messagesToSend);
-        response.Markdown = resp.Markdown;
 
         var historyService = new ChatHistoryService();
         historyService.SaveChat(this);

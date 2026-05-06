@@ -31,34 +31,40 @@ public class OpenAIAdapter
     
     public async Task<ChatMsgViewModel> SendMessageAsync(List<ChatMsgViewModel> request)
     {
-           var r=  await client.CompleteChatAsync(request.Select(p =>
-               {
-                   switch (p.Role.Value)
-                   {
-                      
-                       case "assistant":
-                           return (ChatMessage)new AssistantChatMessage(p.Markdown);
-                           break;
-                       case "user":
-                           return (ChatMessage)new UserChatMessage(p.Markdown);
-                           break;
-                       case "tool":
-                           return (ChatMessage)new ToolChatMessage(p.Markdown);
-                           break;
-                       case "system":
-                       default:
-                           return (ChatMessage)new SystemChatMessage(p.Markdown);
-                           break;
-                   }
-               }
-               
-           ).ToList());
-           return new ChatMsgViewModel()
-           {
-               UserName = "AI",
-               Markdown = string.Join( "" ,r.Value.Content.Select(p=>p.Text)),
-               Role = ChatRole.Assistant
-           };
+        try
+        {
+            var r = await client.CompleteChatAsync(request.Select(p =>
+                {
+                    switch (p.Role.Value)
+                    {
+                        case "assistant":
+                            return (ChatMessage)new AssistantChatMessage(p.Markdown);
+                        case "user":
+                            return (ChatMessage)new UserChatMessage(p.Markdown);
+                        case "tool":
+                            return (ChatMessage)new ToolChatMessage(p.Markdown);
+                        case "system":
+                        default:
+                            return (ChatMessage)new SystemChatMessage(p.Markdown);
+                    }
+                }
+            ).ToList());
+            return new ChatMsgViewModel()
+            {
+                UserName = "AI",
+                Markdown = string.Join("", r.Value.Content.Select(p => p.Text)),
+                Role = ChatRole.Assistant
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ChatMsgViewModel()
+            {
+                UserName = "系统",
+                Markdown = $"**错误**: {ex.Message}",
+                Role = ChatRole.Assistant
+            };
+        }
     }
     
     
