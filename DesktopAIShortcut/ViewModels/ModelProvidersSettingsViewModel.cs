@@ -147,7 +147,7 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
                 Model = provider.SelectedModels.ToArray(),
                 Enabled = provider.IsEnabled,
                 Name = provider.Name,
-                Type = template?.Type?? ApplicationConfig.AIEndpointType.OpenAI,
+                Type = provider.EndpointType,
                 DefaultModel = provider.SelectedModels.FirstOrDefault()??"",
                   
             };
