@@ -210,7 +210,8 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
             Markdown = UserInput,
             UserName = "用户"
         });
-        UserInput = "";
+        if (!SingleAnswerMode)
+            UserInput = "";
 
         var response = new ChatMsgViewModel()
         {
