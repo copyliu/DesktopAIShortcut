@@ -144,6 +144,8 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
                 return;
             }
 
+            response.IsThinking = true;
+
             var adap = new OpenAIAdapter(provider, ModelName);
 
             var messagesToSend = new List<ChatMsgViewModel>();
@@ -174,9 +176,107 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
                 }
             }
 
-            var resp = await adap.SendMessageAsync(messagesToSend);
-            response.Markdown = resp.Markdown;
-            response.UserName = resp.UserName;
+            var firstChunk = true;
+            await adap.SendMessageStreamingAsync(
+                messagesToSend,
+                onTextChunk: chunk =>
+                {
+                    if (firstChunk)
+                    {
+                        firstChunk = false;
+                        response.IsThinking = false;
+                    }
+                    response.AppendText(chunk);
+                },
+                onReasoningChunk: chunk =>
+                {
+                    response.AppendReasoning(chunk);
+                });
+
+            if (firstChunk)
+            {
+                response.IsThinking = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            response.Markdown = $"**调用失败**: {ex.Message}";
+        }
+
+        var historyService = new ChatHistoryService();
+        historyService.SaveChat(this);
+    }
+
+    public async Task RegenerateLastResponseAsync()
+    {
+        var lastAssistant = _messages.LastOrDefault(m => m.Role.Value == "assistant");
+        if (lastAssistant == null) return;
+
+        var lastUser = _messages.LastOrDefault(m => m.Role.Value == "user");
+        if (lastUser == null) return;
+
+        _messages.Remove(lastAssistant);
+
+        var response = new ChatMsgViewModel()
+        {
+            Role = ChatRole.Assistant,
+            Markdown = "",
+            UserName = "AI助手",
+            IsThinking = true
+        };
+        _messages.Add(response);
+
+        try
+        {
+            var provider = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == ProviderId);
+            if (provider == null)
+            {
+                response.Markdown = "**错误**: 未选择大模型供应商，请在设置中配置。";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ModelName))
+            {
+                response.Markdown = "**错误**: 未选择模型，请在上方下拉框中选择。";
+                return;
+            }
+
+            var adap = new OpenAIAdapter(provider, ModelName);
+
+            var messagesToSend = new List<ChatMsgViewModel>();
+            if (SelectedPromptTemplate != null)
+            {
+                foreach (var msg in SelectedPromptTemplate.PrefixMessages)
+                    messagesToSend.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
+            }
+
+            messagesToSend.AddRange(_messages.Take(_messages.Count - 1));
+
+            if (SelectedPromptTemplate != null)
+            {
+                foreach (var msg in SelectedPromptTemplate.SuffixMessages)
+                    messagesToSend.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
+            }
+
+            var firstChunk = true;
+            await adap.SendMessageStreamingAsync(
+                messagesToSend,
+                onTextChunk: chunk =>
+                {
+                    if (firstChunk)
+                    {
+                        firstChunk = false;
+                        response.IsThinking = false;
+                    }
+                    response.AppendText(chunk);
+                },
+                onReasoningChunk: chunk =>
+                {
+                    response.AppendReasoning(chunk);
+                });
+
+            if (firstChunk)
+                response.IsThinking = false;
         }
         catch (Exception ex)
         {

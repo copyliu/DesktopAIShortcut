@@ -13,6 +13,10 @@ public class ChatMsgViewModel:INotifyPropertyChanged
     private string _userName;
     private string _markdown;
     private ObservableStringBuilder _markdownStringBuilder=new ObservableStringBuilder();
+    private ObservableStringBuilder _reasoningBuilder = new ObservableStringBuilder();
+    private string _reasoning = "";
+    private bool _hasReasoning;
+    private bool _isThinking;
     private ChatRole _role;
 
     public ChatRole Role
@@ -64,6 +68,43 @@ public class ChatMsgViewModel:INotifyPropertyChanged
     public ObservableStringBuilder MarkdownStringBuilder
     {
         get => _markdownStringBuilder;
+    }
+
+    public string Reasoning
+    {
+        get => _reasoning;
+        set
+        {
+            if (value == _reasoning) return;
+            _reasoning = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [JsonIgnore]
+    public ObservableStringBuilder ReasoningBuilder
+    {
+        get => _reasoningBuilder;
+    }
+
+    public bool HasReasoning
+    {
+        get => _hasReasoning;
+        set => SetField(ref _hasReasoning, value);
+    }
+
+    public bool IsThinking
+    {
+        get => _isThinking;
+        set => SetField(ref _isThinking, value);
+    }
+
+    public void AppendReasoning(string text)
+    {
+        _reasoning += text;
+        _reasoningBuilder.Append(text);
+        HasReasoning = true;
+        OnPropertyChanged(nameof(Reasoning));
     }
     
     
