@@ -23,7 +23,7 @@ namespace DesktopAIShortcut.Services
         public ChatHistoryService()
         {
             
-            var savefolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            this.savefolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             if (string.IsNullOrEmpty(savefolder))
             {
                 savefolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);

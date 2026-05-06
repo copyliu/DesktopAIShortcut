@@ -118,7 +118,9 @@
   <Border Grid.Column="1" Padding="8" Margin="4" CornerRadius="6" Background="#F7F8FA" BorderBrush="#E1E4E8" BorderThickness="1">
     <StackPanel>
       <TextBlock Text="提示词预设" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-      <ComboBox x:Name="PromptPreset" MinWidth="200" MaxWidth="360" Padding="4" ItemsSource="{Binding Path=$parent[Window].((viewModels:ApplicationViewModel)DataContext).ModelList}">
+      <ComboBox x:Name="PromptPreset" MinWidth="200" MaxWidth="360" Padding="4" 
+                ItemsSource="{Binding Path=$parent[Window].((viewModels:ApplicationViewModel)DataContext).PromptTemplates}"
+                SelectedItem="{Binding SelectedPromptTemplate}">
         <ComboBox.ItemTemplate>
           <DataTemplate x:DataType="models:PromptTemplate">
             <TextBlock Text="{Binding Name}" FontSize="12"/>

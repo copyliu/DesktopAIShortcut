@@ -26,6 +26,11 @@ public partial class ApplicationViewModel:INotifyPropertyChanged
         {
             OnPropertyChanged(nameof(ModelList));
             OnPropertyChanged(nameof(PromptTemplates));
+            foreach (var chat in ChatHistoryListViewModel.ChatHistoryViewModels)
+            {
+                var promptName = chat.SelectedPromptTemplate?.Name ?? chat.PromptName;
+                chat.SelectedPromptTemplate = PromptTemplates.FirstOrDefault(p => p.Name == promptName);
+            }
         };
     }
 

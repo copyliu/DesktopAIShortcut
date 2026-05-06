@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using DesktopAIShortcut.Adapter;
 using DesktopAIShortcut.Models;
+using DesktopAIShortcut.Services;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
@@ -86,6 +87,13 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
         set => SetField(ref _promptName, value);
     }
 
+    private PromptTemplate? _selectedPromptTemplate;
+    public PromptTemplate? SelectedPromptTemplate
+    {
+        get => _selectedPromptTemplate;
+        set => SetField(ref _selectedPromptTemplate, value);
+    }
+
     public bool SingleAnswerMode
     {
         get => _singleAnswerMode;
@@ -94,7 +102,6 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
 
 
 
-    //TODO: client????
     private ChatClient? client;
     
 [RelayCommand]
@@ -106,6 +113,7 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
             Markdown = UserInput,
             UserName = "用户"
         });
+        UserInput = "";
 
         var response = new ChatMsgViewModel()
         {
@@ -116,11 +124,40 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
         this.Messages.Add(response);
         var provider=ApplicationConfig.Instance.Providers.First(p=>p.ProviderId==ProviderId);
         var adap = new OpenAIAdapter(provider, ModelName);
-        var resp = await adap.SendMessageAsync(this._messages.ToList());
+
+        var messagesToSend = new List<ChatMsgViewModel>();
+
+        if (SelectedPromptTemplate != null)
+        {
+            foreach (var msg in SelectedPromptTemplate.PrefixMessages)
+            {
+                messagesToSend.Add(new ChatMsgViewModel()
+                {
+                    Role = msg.Role,
+                    Markdown = msg.Content
+                });
+            }
+        }
+
+        messagesToSend.AddRange(this._messages.Take(this._messages.Count - 1));
+
+        if (SelectedPromptTemplate != null)
+        {
+            foreach (var msg in SelectedPromptTemplate.SuffixMessages)
+            {
+                messagesToSend.Add(new ChatMsgViewModel()
+                {
+                    Role = msg.Role,
+                    Markdown = msg.Content
+                });
+            }
+        }
+
+        var resp = await adap.SendMessageAsync(messagesToSend);
         response.Markdown = resp.Markdown;
-        
-        
-        return;
+
+        var historyService = new ChatHistoryService();
+        historyService.SaveChat(this);
     }
     
     

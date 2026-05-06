@@ -39,7 +39,8 @@ public partial class ChatHistoryListViewModel: INotifyPropertyChanged
     {
         var newmodel = new ChatHistoryViewModel()
         {
-            Id = Guid.NewGuid().ToString()
+            Id = Guid.NewGuid().ToString(),
+            Title = $"聊天{_chatHistoryViewModels.Count + 1}"
         };
         this._chatHistoryViewModels.Add(newmodel);
         this.CurrentChatHistoryViewModel = newmodel;
