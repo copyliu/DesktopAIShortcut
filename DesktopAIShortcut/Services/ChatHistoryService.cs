@@ -71,12 +71,7 @@ namespace DesktopAIShortcut.Services
             }
 
             // 初始化第一条消息
-            var currentMessage = new ChatMsgViewModel
-            {
-               Role = validMessages[0].Role,
-                UserName = "",
-                Markdown = validMessages[0].Markdown
-            };
+            var currentMessage = CloneMessage(validMessages[0]);
 
             // 从第二条消息开始处理
             for (int i = 1; i < validMessages.Count; i++)
@@ -95,12 +90,7 @@ namespace DesktopAIShortcut.Services
                 {
                     // 如果角色不同，保存当前消息并开始新的消息
                     cleanedMessages.Add(currentMessage);
-                    currentMessage = new ChatMsgViewModel
-                    {
-                     
-                       Role = message.Role,
-                       Markdown =  message.Markdown,
-                    };
+                    currentMessage = CloneMessage(message);
                 }
             }
 
@@ -110,6 +100,21 @@ namespace DesktopAIShortcut.Services
             // 更新聊天记录中的消息列表
             chat.Messages=new ObservableCollection<ChatMsgViewModel>(cleanedMessages);
             return chat;
+        }
+
+        private static ChatMsgViewModel CloneMessage(ChatMsgViewModel source)
+        {
+            var clone = new ChatMsgViewModel
+            {
+                Role = source.Role,
+                UserName = source.UserName,
+                Markdown = source.Markdown,
+                Reasoning = source.Reasoning,
+                HasReasoning = source.HasReasoning,
+            };
+            if (!string.IsNullOrEmpty(source.Reasoning))
+                clone.ReasoningBuilder.Append(source.Reasoning);
+            return clone;
         }
 
         /// <summary>
