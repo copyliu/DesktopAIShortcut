@@ -65,6 +65,14 @@ public class ResponsesAdapter
                         onReasoningChunk?.Invoke(reasoningDelta.Delta);
                         break;
 
+                    case StreamingResponseReasoningSummaryTextDeltaUpdate summaryDelta:
+                        onReasoningChunk?.Invoke(summaryDelta.Delta);
+                        break;
+
+                    case StreamingResponseReasoningTextDoneUpdate:
+                    case StreamingResponseReasoningSummaryTextDoneUpdate:
+                        break;
+
                     case StreamingResponseOutputTextDeltaUpdate textDelta:
                         onTextChunk(textDelta.Delta);
                         break;

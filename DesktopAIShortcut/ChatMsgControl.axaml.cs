@@ -66,7 +66,8 @@ public partial class ChatMsgControl : UserControl
 
         var isAssistant = vm.Role.Value == "assistant" || vm.Role.Value == "system";
         ActionsPanel.IsVisible = isAssistant && !vm.IsThinking;
-        ReasoningExpander.IsVisible = isAssistant && (vm.IsThinking || vm.HasReasoning);
+        ReasoningExpander.IsVisible = isAssistant && vm.HasReasoning;
+        ReasoningExpander.IsExpanded = isAssistant && vm.IsThinking;
     }
 
     private async void CopyMarkdownBtn_OnClick(object? sender, RoutedEventArgs e)
