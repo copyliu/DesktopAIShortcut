@@ -103,7 +103,84 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
 
 
     private ChatClient? client;
-    
+
+    private List<ChatMsgViewModel> BuildMessagesToSend()
+    {
+        var result = new List<ChatMsgViewModel>();
+        if (SelectedPromptTemplate != null)
+        {
+            foreach (var msg in SelectedPromptTemplate.PrefixMessages)
+                result.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
+        }
+        result.AddRange(_messages.Take(_messages.Count - 1));
+        if (SelectedPromptTemplate != null)
+        {
+            foreach (var msg in SelectedPromptTemplate.SuffixMessages)
+                result.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
+        }
+        return result;
+    }
+
+    private async Task SendStreamingWithAdapter(
+        ApplicationConfig.Provider provider,
+        List<ChatMsgViewModel> messagesToSend,
+        ChatMsgViewModel response)
+    {
+        var firstChunk = true;
+
+        Action<string> onText = chunk =>
+        {
+            if (firstChunk) { firstChunk = false; response.IsThinking = false; }
+            response.AppendText(chunk);
+        };
+
+        Action<string> onReasoning = chunk =>
+        {
+            response.AppendReasoning(chunk);
+        };
+
+        if (provider.Type == ApplicationConfig.AIEndpointType.OpenAIResponses)
+        {
+            var adapter = new ResponsesAdapter(provider, ModelName);
+            await adapter.SendResponseStreamingAsync(messagesToSend, onText, onReasoning);
+        }
+        else
+        {
+            var adapter = new OpenAIAdapter(provider, ModelName);
+            await adapter.SendMessageStreamingAsync(messagesToSend, onText, onReasoning);
+        }
+
+        if (firstChunk) response.IsThinking = false;
+    }
+
+    private static ApplicationConfig.Provider? GetProvider(string providerId)
+    {
+        return ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == providerId);
+    }
+
+    private static ApplicationConfig.Provider? ValidateAndPrepare(
+        ApplicationConfig.Provider? provider,
+        string modelName,
+        ChatMsgViewModel response)
+    {
+        if (provider == null)
+        {
+            response.Markdown = "**错误**: 未选择大模型供应商，请在设置中配置。";
+            return null!;
+        }
+        if (string.IsNullOrEmpty(modelName))
+        {
+            response.Markdown = "**错误**: 未选择模型，请在上方下拉框中选择。";
+            return null!;
+        }
+        if (string.IsNullOrEmpty(provider.Key))
+        {
+            response.Markdown = "**错误**: 未设置API密钥，请在设置中配置。";
+            return null!;
+        }
+        return provider;
+    }
+
 [RelayCommand]
     public async Task AddUserMessageAsync()
     {
@@ -125,78 +202,11 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
 
         try
         {
-            var provider = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == ProviderId);
-            if (provider == null)
-            {
-                response.Markdown = "**错误**: 未选择大模型供应商，请在设置中配置。";
-                return;
-            }
-
-            if (string.IsNullOrEmpty(ModelName))
-            {
-                response.Markdown = "**错误**: 未选择模型，请在上方下拉框中选择。";
-                return;
-            }
-
-            if (string.IsNullOrEmpty(provider.Key))
-            {
-                response.Markdown = "**错误**: 未设置API密钥，请在设置中配置。";
-                return;
-            }
+            var provider = ValidateAndPrepare(GetProvider(ProviderId), ModelName, response);
+            if (provider == null) return;
 
             response.IsThinking = true;
-
-            var adap = new OpenAIAdapter(provider, ModelName);
-
-            var messagesToSend = new List<ChatMsgViewModel>();
-
-            if (SelectedPromptTemplate != null)
-            {
-                foreach (var msg in SelectedPromptTemplate.PrefixMessages)
-                {
-                    messagesToSend.Add(new ChatMsgViewModel()
-                    {
-                        Role = msg.Role,
-                        Markdown = msg.Content
-                    });
-                }
-            }
-
-            messagesToSend.AddRange(this._messages.Take(this._messages.Count - 1));
-
-            if (SelectedPromptTemplate != null)
-            {
-                foreach (var msg in SelectedPromptTemplate.SuffixMessages)
-                {
-                    messagesToSend.Add(new ChatMsgViewModel()
-                    {
-                        Role = msg.Role,
-                        Markdown = msg.Content
-                    });
-                }
-            }
-
-            var firstChunk = true;
-            await adap.SendMessageStreamingAsync(
-                messagesToSend,
-                onTextChunk: chunk =>
-                {
-                    if (firstChunk)
-                    {
-                        firstChunk = false;
-                        response.IsThinking = false;
-                    }
-                    response.AppendText(chunk);
-                },
-                onReasoningChunk: chunk =>
-                {
-                    response.AppendReasoning(chunk);
-                });
-
-            if (firstChunk)
-            {
-                response.IsThinking = false;
-            }
+            await SendStreamingWithAdapter(provider, BuildMessagesToSend(), response);
         }
         catch (Exception ex)
         {
@@ -212,9 +222,6 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
         var lastAssistant = _messages.LastOrDefault(m => m.Role.Value == "assistant");
         if (lastAssistant == null) return;
 
-        var lastUser = _messages.LastOrDefault(m => m.Role.Value == "user");
-        if (lastUser == null) return;
-
         _messages.Remove(lastAssistant);
 
         var response = new ChatMsgViewModel()
@@ -228,55 +235,10 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
 
         try
         {
-            var provider = ApplicationConfig.Instance.Providers.FirstOrDefault(p => p.ProviderId == ProviderId);
-            if (provider == null)
-            {
-                response.Markdown = "**错误**: 未选择大模型供应商，请在设置中配置。";
-                return;
-            }
+            var provider = ValidateAndPrepare(GetProvider(ProviderId), ModelName, response);
+            if (provider == null) return;
 
-            if (string.IsNullOrEmpty(ModelName))
-            {
-                response.Markdown = "**错误**: 未选择模型，请在上方下拉框中选择。";
-                return;
-            }
-
-            var adap = new OpenAIAdapter(provider, ModelName);
-
-            var messagesToSend = new List<ChatMsgViewModel>();
-            if (SelectedPromptTemplate != null)
-            {
-                foreach (var msg in SelectedPromptTemplate.PrefixMessages)
-                    messagesToSend.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
-            }
-
-            messagesToSend.AddRange(_messages.Take(_messages.Count - 1));
-
-            if (SelectedPromptTemplate != null)
-            {
-                foreach (var msg in SelectedPromptTemplate.SuffixMessages)
-                    messagesToSend.Add(new ChatMsgViewModel { Role = msg.Role, Markdown = msg.Content });
-            }
-
-            var firstChunk = true;
-            await adap.SendMessageStreamingAsync(
-                messagesToSend,
-                onTextChunk: chunk =>
-                {
-                    if (firstChunk)
-                    {
-                        firstChunk = false;
-                        response.IsThinking = false;
-                    }
-                    response.AppendText(chunk);
-                },
-                onReasoningChunk: chunk =>
-                {
-                    response.AppendReasoning(chunk);
-                });
-
-            if (firstChunk)
-                response.IsThinking = false;
+            await SendStreamingWithAdapter(provider, BuildMessagesToSend(), response);
         }
         catch (Exception ex)
         {

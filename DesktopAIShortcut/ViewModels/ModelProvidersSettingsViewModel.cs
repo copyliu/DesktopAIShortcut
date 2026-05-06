@@ -22,6 +22,7 @@ public partial class ModelProvidersSettingsViewModel : INotifyPropertyChanged
     public ObservableCollection<ApplicationConfig.AIEndpointType> ProviderTypes { get; }=
     [
         ApplicationConfig.AIEndpointType.OpenAI,
+        ApplicationConfig.AIEndpointType.OpenAIResponses,
         ApplicationConfig.AIEndpointType.Gemini,
         ApplicationConfig.AIEndpointType.OLLAMA
     ];

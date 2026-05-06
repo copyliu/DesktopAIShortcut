@@ -21,6 +21,7 @@ public class ApplicationConfig
     public enum AIEndpointType
     {
         [Description("OpenAI兼容")] OpenAI,
+        [Description("OpenAI Responses")] OpenAIResponses,
         [Description("Google Gemini兼容")] Gemini,
         [Description("Ollama 本地模型兼容")] OLLAMA,
     }
