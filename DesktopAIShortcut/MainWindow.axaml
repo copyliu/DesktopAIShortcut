@@ -12,8 +12,8 @@
         ExtendClientAreaToDecorationsHint="True"
         x:Class="DesktopAIShortcut.MainWindow"
         TransparencyLevelHint="Mica, AcrylicBlur"
-        MinHeight="300"
-        MinWidth="500"
+        MinHeight="450"
+        MinWidth="700"
         CanResize="True"
         Title="桌面AI小助手"
         x:DataType="viewModels:ApplicationViewModel"  >

@@ -13,8 +13,8 @@ namespace DesktopAIShortcut
     public partial class App : Application
     {
         private   MainWindow _mainWindow;
-        public const int DefaultWidth = 500;
-        public const int DefaultHeight = 300;
+        public const int DefaultWidth = 900;
+        public const int DefaultHeight = 650;
         public override void Initialize()
         {
            ApplicationConfig.LoadSettings();
