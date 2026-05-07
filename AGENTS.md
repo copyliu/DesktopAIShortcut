@@ -171,6 +171,7 @@ using DesktopAIShortcut.Models;
 - **使用简体中文**
 - 一行标题控制在 50 字以内，详细信息换行写
 - 不要写 "stuff"、"fix" 等无意义消息
+- 提交信息末尾须包含 `Co-authored-by: {模型名称} <{模型名称}@{工具名称}>`
 
 ---
 
