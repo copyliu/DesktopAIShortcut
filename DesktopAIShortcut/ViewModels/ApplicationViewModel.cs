@@ -47,6 +47,10 @@ public partial class ApplicationViewModel:INotifyPropertyChanged
             foreach (var chat in chats)
             {
                 chat.ResolveSelectedModel();
+                if (!string.IsNullOrEmpty(chat.PromptName))
+                {
+                    chat.SelectedPromptTemplate = PromptTemplates.FirstOrDefault(p => p.Name == chat.PromptName);
+                }
                 ChatHistoryListViewModel.ChatHistoryViewModels.Add(chat);
             }
             if (ChatHistoryListViewModel.ChatHistoryViewModels.Count > 0)

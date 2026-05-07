@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -95,6 +96,18 @@ namespace DesktopAIShortcut.Models
             field = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             return true;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is PromptTemplate other)
+                return _name == other._name;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return _name.GetHashCode();
         }
     }
 }

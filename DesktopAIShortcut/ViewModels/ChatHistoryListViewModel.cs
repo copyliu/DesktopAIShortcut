@@ -24,6 +24,12 @@ public partial class ChatHistoryListViewModel: INotifyPropertyChanged
         }
         this.CurrentChatHistoryViewModel = model;
         model.ResolveSelectedModel();
+        if (!string.IsNullOrEmpty(model.PromptName))
+        {
+            model.SelectedPromptTemplate = ApplicationConfig.Instance.ChatPresets
+                .Select(p => new PromptTemplate(p))
+                .FirstOrDefault(p => p.Name == model.PromptName);
+        }
     }
     [RelayCommand]
     private void RemoveChat(ChatHistoryViewModel model)
