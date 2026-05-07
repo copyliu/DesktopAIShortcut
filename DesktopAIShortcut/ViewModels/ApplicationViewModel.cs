@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using DesktopAIShortcut.Models;
+using DesktopAIShortcut.Services;
 
 namespace DesktopAIShortcut.ViewModels;
 
@@ -30,8 +31,33 @@ public partial class ApplicationViewModel:INotifyPropertyChanged
             {
                 var promptName = chat.SelectedPromptTemplate?.Name ?? chat.PromptName;
                 chat.SelectedPromptTemplate = PromptTemplates.FirstOrDefault(p => p.Name == promptName);
+                chat.ResolveSelectedModel();
             }
         };
+
+        LoadChatHistory();
+    }
+
+    private void LoadChatHistory()
+    {
+        try
+        {
+            var historyService = new ChatHistoryService();
+            var chats = historyService.LoadAllChats();
+            foreach (var chat in chats)
+            {
+                chat.ResolveSelectedModel();
+                ChatHistoryListViewModel.ChatHistoryViewModels.Add(chat);
+            }
+            if (ChatHistoryListViewModel.ChatHistoryViewModels.Count > 0)
+            {
+                ChatHistoryListViewModel.CurrentChatHistoryViewModel = ChatHistoryListViewModel.ChatHistoryViewModels[0];
+            }
+        }
+        catch
+        {
+            // 加载失败时忽略，后续可由用户手动创建新对话
+        }
     }
 
 

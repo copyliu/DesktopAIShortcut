@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.Input;
+using DesktopAIShortcut.Models;
+using DesktopAIShortcut.Services;
 
 namespace DesktopAIShortcut.ViewModels;
 
@@ -20,6 +23,7 @@ public partial class ChatHistoryListViewModel: INotifyPropertyChanged
             _chatHistoryViewModels.Add(model);
         }
         this.CurrentChatHistoryViewModel = model;
+        model.ResolveSelectedModel();
     }
     [RelayCommand]
     private void RemoveChat(ChatHistoryViewModel model)
@@ -27,6 +31,15 @@ public partial class ChatHistoryListViewModel: INotifyPropertyChanged
         if (_chatHistoryViewModels.Contains(model))
         {
             _chatHistoryViewModels.Remove(model);
+            try
+            {
+                var historyService = new ChatHistoryService();
+                historyService.DeleteChat(model.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"删除聊天记录失败: {ex.Message}");
+            }
         }
         if (this.CurrentChatHistoryViewModel == model)
         {
@@ -42,9 +55,25 @@ public partial class ChatHistoryListViewModel: INotifyPropertyChanged
             Id = Guid.NewGuid().ToString(),
             Title = $"聊天{_chatHistoryViewModels.Count + 1}"
         };
+
+        var firstProvider = ApplicationConfig.Instance.Providers.FirstOrDefault();
+        if (firstProvider != null)
+        {
+            var defaultModel = firstProvider.DefaultModel ?? firstProvider.Model.FirstOrDefault() ?? "";
+            newmodel.ProviderId = firstProvider.ProviderId;
+            newmodel.ModelName = defaultModel;
+            newmodel.SelectedModelItem = new ModelSelectionViewModel(firstProvider, defaultModel);
+        }
+
+        var defaultTemplate = ApplicationConfig.Instance.ChatPresets.FirstOrDefault(p => p.IsDefault)
+            ?? ApplicationConfig.Instance.ChatPresets.FirstOrDefault();
+        if (defaultTemplate != null)
+        {
+            newmodel.SelectedPromptTemplate = new PromptTemplate(defaultTemplate);
+        }
+
         this._chatHistoryViewModels.Add(newmodel);
         this.CurrentChatHistoryViewModel = newmodel;
-
     }
     
     public ChatHistoryViewModel CurrentChatHistoryViewModel

@@ -91,7 +91,44 @@ public partial class ChatHistoryViewModel : INotifyPropertyChanged
     public PromptTemplate? SelectedPromptTemplate
     {
         get => _selectedPromptTemplate;
-        set => SetField(ref _selectedPromptTemplate, value);
+        set
+        {
+            if (SetField(ref _selectedPromptTemplate, value))
+            {
+                PromptName = value?.Name ?? "";
+            }
+        }
+    }
+
+    private ModelSelectionViewModel? _selectedModelItem;
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ModelSelectionViewModel? SelectedModelItem
+    {
+        get => _selectedModelItem;
+        set
+        {
+            if (SetField(ref _selectedModelItem, value) && value != null)
+            {
+                _providerId = value.SelectedProvider.ProviderId;
+                _modelName = value.SelectedModel;
+                OnPropertyChanged(nameof(ProviderId));
+                OnPropertyChanged(nameof(ModelName));
+            }
+        }
+    }
+
+    public void ResolveSelectedModel()
+    {
+        if (string.IsNullOrEmpty(_providerId) || string.IsNullOrEmpty(_modelName))
+        {
+            _selectedModelItem = null;
+            return;
+        }
+        _selectedModelItem = ApplicationConfig.Instance.Providers
+            .Where(p => p.ProviderId == _providerId)
+            .SelectMany(p => p.Model.Select(m => new ModelSelectionViewModel(p, m)))
+            .FirstOrDefault(m => m.SelectedModel == _modelName);
+        OnPropertyChanged(nameof(SelectedModelItem));
     }
 
     public bool SingleAnswerMode
