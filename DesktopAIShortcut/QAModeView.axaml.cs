@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -11,6 +13,37 @@ public partial class QAModeView : UserControl
     public QAModeView()
     {
         InitializeComponent();
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        if (DataContext is ChatHistoryViewModel oldVm)
+            oldVm.PropertyChanged -= OnViewModelPropertyChanged;
+        
+        if (DataContext is ChatHistoryViewModel newVm)
+        {
+            newVm.PropertyChanged += OnViewModelPropertyChanged;
+            UpdateMarkdownBuilders(newVm);
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ChatHistoryViewModel.LastAssistant) && DataContext is ChatHistoryViewModel vm)
+        {
+            UpdateMarkdownBuilders(vm);
+        }
+    }
+
+    private void UpdateMarkdownBuilders(ChatHistoryViewModel vm)
+    {
+        var assistant = vm.LastAssistant;
+        if (assistant != null)
+        {
+            ReasoningMarkdown.MarkdownBuilder = assistant.ReasoningBuilder;
+            OutputMarkdown.MarkdownBuilder = assistant.MarkdownStringBuilder;
+        }
     }
 
     private async void CopyMarkdown_OnClick(object? sender, RoutedEventArgs e)

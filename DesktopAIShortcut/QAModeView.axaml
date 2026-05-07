@@ -17,13 +17,13 @@
             <StackPanel Spacing="4">
                 <Expander Header="思考中..." IsVisible="{Binding LastAssistant.HasReasoning}"
                           IsExpanded="{Binding LastAssistant.IsThinking}">
-                    <avalonia1:MarkdownRenderer MarkdownBuilder="{Binding LastAssistant.ReasoningBuilder}" />
+                    <avalonia1:MarkdownRenderer x:Name="ReasoningMarkdown" />
                 </Expander>
 
                 <Border Padding="8" CornerRadius="6" BorderBrush="#E1E4E8" BorderThickness="1" Background="#F7F8FA">
                     <StackPanel Spacing="6">
                         <TextBlock Text="输出" FontSize="13" FontWeight="SemiBold" />
-                        <avalonia1:MarkdownRenderer MarkdownBuilder="{Binding LastAssistant.MarkdownStringBuilder}" />
+                        <avalonia1:MarkdownRenderer x:Name="OutputMarkdown" />
                     </StackPanel>
                 </Border>
 
