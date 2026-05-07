@@ -40,7 +40,9 @@
             <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" Margin="10,0,0,0" CornerRadius="5">
                 <ScrollViewer >
                     <StackPanel Spacing="10" Margin="10">
-                        <TextBlock Text="{Binding SelectedProvider.Name}" FontSize="16" FontWeight="Bold"/>
+                        <TextBox Text="{Binding SelectedProvider.Name}" FontSize="16" FontWeight="Bold"
+                                 IsReadOnly="{Binding SelectedProvider.FromTemplate}"
+                                 Watermark="输入供应商名称"/>
                         
                         <!-- 启用状态 -->
                         <CheckBox Content="启用该提供商" IsChecked="{Binding SelectedProvider.IsEnabled}"/>
