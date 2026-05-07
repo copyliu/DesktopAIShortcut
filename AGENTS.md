@@ -6,11 +6,11 @@
 
 ## 1. 项目概览
 
-**DesktopAIShortcut** 是一个 Windows 桌面 AI 聊天客户端，基于 .NET 10.0 + Avalonia UI 11.3 构建，通过 OpenAI SDK 对接多种 AI 模型提供商。支持流式对话、思考过程显示、Markdown 渲染、多模型管理、问答模式、聊天历史持久化等功能。
+**DesktopAIShortcut** 是一款跨平台桌面 AI 聊天客户端，基于 .NET 10.0 + Avalonia UI 11.3 构建，通过 OpenAI SDK 对接多种 AI 模型提供商。支持流式对话、思考过程显示、Markdown 渲染、多模型管理、问答模式、聊天历史持久化等功能。
 
 **许可证**: MPL 2.0
 
-**目标平台**: Windows x64 / x86 (AOT 兼容)
+**目标平台**: Windows / macOS / Linux 桌面端 (AOT 兼容)
 
 ---
 
@@ -37,38 +37,21 @@
 ```
 DesktopAIShortcut/
 ├── Adapter/                  # AI API 适配器层
-│   ├── OpenAIAdapter.cs      # Chat Completions API (流式 + 非流式)
-│   └── ResponsesAdapter.cs   # Responses API (流式推理)
 ├── Models/                   # 数据模型 (纯数据，无逻辑)
-│   ├── ApplicationConfig.cs  # 应用配置根模型
-│   ├── ChatHistoryModel.cs   # 聊天历史持久化模型
-│   ├── ChatMessage.cs        # 单条聊天消息
-│   ├── ChatMsgModel.cs       # 聊天消息模型
-│   ├── ContextMessage.cs     # 上下文消息 (提示词注入)
-│   ├── ModelProvider.cs      # AI 模型提供商配置
-│   └── PromptTemplate.cs     # 提示词预设模板
 ├── ViewModels/               # 视图模型 (MVVM 的 VM 层)
-│   ├── ApplicationViewModel.cs
-│   ├── ChatHistoryListViewModel.cs
-│   ├── ChatHistoryViewModel.cs
-│   ├── ChatMsgViewModel.cs   # 单条消息 VM (实现 INotifyPropertyChanged)
-│   ├── ModelSelectionViewModel.cs
-│   ├── ModelProvidersSettingsViewModel.cs
-│   └── PromptTemplatesViewModel.cs
 ├── Services/                 # 业务服务层
-│   └── ChatHistoryService.cs # 聊天历史 CRUD (JSON 文件持久化)
 ├── Commands/                 # 通用命令
-│   └── RelayCommand.cs       # ICommand 实现
 ├── Converters/               # XAML 值转换器
-│   └── BoolToIndexConverter.cs
 ├── Settings/                 # 各设置页面的 View + ViewModel
+├── Assets/                   # 图标与素材
 ├── App.axaml / App.axaml.cs  # Avalonia 应用入口
 ├── Program.cs                # .NET Main 入口
 ├── MainWindow.axaml / .cs    # 主聊天窗口
 ├── QAModeView.axaml / .cs    # 问答模式界面
 ├── SettingWindow.axaml / .cs # 设置窗口
-├── ChatMsgControl.axaml / .cs # 单条消息气泡控件
-└── AISettings.cs             # AI 设置管理
+└── ChatMsgControl.axaml / .cs # 单条消息气泡控件
+
+DesktopAIShortcutPackaging/   # MSIX 打包项目 (仅 Windows)
 ```
 
 **分层规则**:
@@ -203,10 +186,11 @@ using DesktopAIShortcut.Models;
 
 ### 6.2 注意事项
 
-- 编译目标为 Windows (`net10.0-windows`)，非 Windows 平台编译行为不同
-- 项目配置了 `IsAotCompatible=true`，避免使用不被 AOT 支持的特性
+- 在 Windows 上编译目标为 `net10.0-windows`，macOS/Linux 上为 `net10.0`
+- 项目配置了 `IsAotCompatible=true`，避免使用不被 AOT 支持的特性（如 `MakeGenericType` 等动态反射）
 - 已废弃的 `SettingWindowOld.axaml` / `.cs` 已在 `.csproj` 中排除编译
 - `SettingWindowOld.axaml.cs` 不再使用，`Settings/` 目录下是新的分页设置窗口
+- `DesktopAIShortcutPackaging/` 为 Windows 专属 MSIX 打包项目，日常开发不需改它
 
 ---
 
@@ -257,6 +241,10 @@ using DesktopAIShortcut.Models;
 4. **JSON 序列化**: 使用 `System.Text.Json`，非 `Newtonsoft.Json`；需要源码生成的场景使用 `SourceGenerationContext.cs`
 5. **AOT 兼容**: 项目设置 `IsAotCompatible=true`，不能使用 `MakeGenericType` 等动态反射
 6. **打包项目**: `DesktopAIShortcutPackaging/` 是独立的 Windows Application Packaging Project，仅用于 MSIX 发布，日常开发不需改它
+7. **跨平台路径**: 使用 `Path.Combine` 而非硬编码 `\` 或 `/`，确保在 Windows/macOS/Linux 上均正确
+8. **平台特定 API**: 避免使用 Windows 专有 API（如 Windows Forms、WinRT），Avalonia 提供跨平台替代方案
+9. **文件存储路径**: 使用 `Environment.GetFolderPath(Environment.SpecialFolder.xxx)` 获取系统数据目录，该模式已在 `ChatHistoryService` 中使用
+10. **条件编译**: 如需平台特定代码，使用 `#if WINDOWS` / `#if MACOS` / `#if LINUX` 预处理器指令隔离
 
 ---
 
